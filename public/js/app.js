@@ -1,1 +1,1 @@
-console.log("js loaded");
+function initialize(){var e=37.09024,o=-95.712891,n=new google.maps.LatLng(e,o),a={zoom:4,center:n};new google.maps.Map(document.getElementById("map"),a)}console.log("js loaded"),google.maps.event.addDomListener(window,"load",initialize);
