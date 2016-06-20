@@ -48,6 +48,9 @@ function initialize() {
     var pt2Lat = pt2[1];
     var pt2Long = pt2[2];
 
+    latLng1 = new google.maps.LatLng(pt1Lat, pt1Long);
+    latLng2 = new google.maps.LatLng(pt2Lat, pt2Long);
+
     var networkCoordinates = [
       {lat: pt1Lat, lng: pt1Long},
       {lat: pt2Lat, lng: pt2Long},
@@ -58,12 +61,30 @@ function initialize() {
       geodesic: true,
       strokeColor: '#FF0000',
       strokeOpacity: 1.0,
-      strokeWeight: 2
+      strokeWeight: 2,
     });
 
     networkPath.setMap(map);
     console.log(pt1[0], ' to ', pt2[0]);
     console.log(distance(pt1Lat, pt1Long, pt2Lat, pt2Long));
+
+    // get the point half-way between the two markers
+    inBetween = google.maps.geometry.spherical.interpolate(latLng1, latLng2, 0.5); 
+
+    // calculate distance between two points
+    var dist = distance(pt1Lat, pt1Long, pt2Lat, pt2Long);
+    
+    var mapLabel = new MapLabel({
+      text: dist + ' mi',
+      position: inBetween,
+      map: map,
+      fontSize: 20,
+    });
+
+    mapLabel.set('position', inBetween);
+
+
+
   };
 };
 
