@@ -1,0 +1,21 @@
+{
+  "name": "highwinds",
+  "homepage": "https://github.com/karhodes/highwinds",
+  "authors": [
+    "Kelly Rhodes <krhodes1@fullsail.edu>"
+  ],
+  "description": "homework assignment for highwinds",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap-sass": "^3.3.6"
+  }
+}
