@@ -1,5 +1,4 @@
 // GULP for JS ******************************************
-// This is where app.js is created from the ng folder
 
 // Dependencies:
 const gulp = require('gulp');

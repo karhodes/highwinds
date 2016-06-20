@@ -6210,3 +6210,8 @@ button.close {
 @media print {
   .hidden-print {
     display: none !important; } }
+
+#map {
+  width: 100%;
+  height: 400px;
+  background-color: grey; }
