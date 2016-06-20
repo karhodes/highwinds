@@ -13,7 +13,15 @@ function initialize() {
     mapOptions);
 
   setMarkers(map);
-  setNetwork(map);
+  setNetworkLine(map, pops[0], pops[1]); // NY to DC
+  setNetworkLine(map, pops[1], pops[2]); // DC to Atl
+  setNetworkLine(map, pops[2], pops[7]); // Atl to Mia
+  setNetworkLine(map, pops[2], pops[3]); // Atl to DFW
+  setNetworkLine(map, pops[3], pops[7]); // DFW to Mia
+  setNetworkLine(map, pops[3], pops[4]); // DFW to LAX
+  setNetworkLine(map, pops[4], pops[6]); // LAX to Seattle
+  setNetworkLine(map, pops[6], pops[5]); // Seattle to Chicago
+  setNetworkLine(map, pops[5], pops[0]); // Chicago to NYC
 
   // create markers for points of presence (pops)
   function setMarkers(map){
@@ -34,72 +42,29 @@ function initialize() {
   };
 
   // create "network" connections
-  function setNetwork(map){
-    var networkCoordinates1 = [
-      {lat: pops[0][1], lng: pops[0][2]}, // New York
-      {lat: pops[1][1], lng: pops[1][2]}, // DC
-      {lat: pops[2][1], lng: pops[2][2]}, // Atlanta
-      {lat: pops[7][1], lng: pops[7][2]}, // Miami
-      {lat: pops[3][1], lng: pops[3][2]}, // Dallas
-      {lat: pops[4][1], lng: pops[4][2]}, // LAX
-      {lat: pops[6][1], lng: pops[6][2]}, // Seattle
-      {lat: pops[5][1], lng: pops[5][2]}, // Chicago
-      {lat: pops[0][1], lng: pops[0][2]}, // New York
+  function setNetworkLine(map, pt1, pt2){
+    var pt1Lat = pt1[1];
+    var pt1Long = pt1[2];
+    var pt2Lat = pt2[1];
+    var pt2Long = pt2[2];
+
+    var networkCoordinates = [
+      {lat: pt1Lat, lng: pt1Long},
+      {lat: pt2Lat, lng: pt2Long},
     ];
 
-    var networkPath1 = new google.maps.Polyline({
-      path: networkCoordinates1,
+    var networkPath = new google.maps.Polyline({
+      path: networkCoordinates,
       geodesic: true,
       strokeColor: '#FF0000',
       strokeOpacity: 1.0,
       strokeWeight: 2
     });
 
-    var networkCoordinates2 = [
-      {lat: pops[2][1], lng: pops[2][2]}, // Atlanta
-      {lat: pops[3][1], lng: pops[3][2]}, // Dallas
-    ];
-
-    var networkPath2 = new google.maps.Polyline({
-      path: networkCoordinates2,
-      geodesic: true,
-      strokeColor: '#FF0000',
-      strokeOpacity: 1.0,
-      strokeWeight: 2
-    });
-
-  networkPath1.setMap(map);
-  networkPath2.setMap(map);
+    networkPath.setMap(map);
+    console.log(pt1[0], ' to ', pt2[0]);
+    console.log(distance(pt1Lat, pt1Long, pt2Lat, pt2Long));
   };
-
-  // calculate distances
-  console.log(pops[0][0], ' to ', pops[1][0]);
-  console.log(distance(pops[0][1], pops[0][2], pops[1][1], pops[1][1])); // NY to DC
-  
-  console.log(pops[1][0], ' to ', pops[2][0]);
-  console.log(distance(pops[1][1], pops[1][2], pops[2][1], pops[2][1])); // DC to Atl
-  
-  console.log(pops[2][0], ' to ', pops[7][0]);
-  console.log(distance(pops[2][1], pops[2][2], pops[7][1], pops[7][1])); // Atl to Mia
-  
-  console.log(pops[7][0], ' to ', pops[3][0]);
-  console.log(distance(pops[7][1], pops[7][2], pops[3][1], pops[3][1])); // Mia to DFW
-  
-  console.log(pops[3][0], ' to ', pops[4][0]);
-  console.log(distance(pops[3][1], pops[3][2], pops[4][1], pops[4][1])); // DFW to LAX
-  
-  console.log(pops[4][0], ' to ', pops[6][0]);
-  console.log(distance(pops[4][1], pops[4][2], pops[6][1], pops[6][1])); // LAX to Seattle
-  
-  console.log(pops[6][0], ' to ', pops[5][0]);
-  console.log(distance(pops[6][1], pops[6][2], pops[5][1], pops[5][1])); // Seattle to Chicago
-
-  console.log(pops[5][0], ' to ', pops[0][0]);
-  console.log(distance(pops[5][1], pops[5][2], pops[0][1], pops[0][1])); // Chicago to NYC
-
-  console.log(pops[2][0], ' to ', pops[3][0]);
-  console.log(distance(pops[2][1], pops[2][2], pops[3][1], pops[3][1])); // Atl to DFW
-
 };
 
 google.maps.event.addDomListener(window, 'load', initialize);
