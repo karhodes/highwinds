@@ -1,5 +1,3 @@
-console.log('js loaded');
-
 function initialize() {
   // create new google map
   var usaLat = 37.09024;
@@ -65,8 +63,6 @@ function initialize() {
     });
 
     networkPath.setMap(map);
-    console.log(pt1[0], ' to ', pt2[0]);
-    console.log(distance(pt1Lat, pt1Long, pt2Lat, pt2Long));
 
     // get the point half-way between the two markers
     inBetween = google.maps.geometry.spherical.interpolate(latLng1, latLng2, 0.5); 
@@ -82,9 +78,6 @@ function initialize() {
     });
 
     mapLabel.set('position', inBetween);
-
-
-
   };
 };
 

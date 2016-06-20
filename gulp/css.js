@@ -11,13 +11,9 @@ gulp.task('cssBuild', function () { 
 	return gulp.src('sass/*.scss', {
 		style: 'compressed',
 			loadPath: [
-				'./sass',
-				'bower_components/bootstrap-sass/assets/stylesheets'
+				'./sass'
 			],
 	}) 
-  .pipe(sass({
-    includePaths: 'bower_components/bootstrap-sass/assets/stylesheets',
-  }))
   .pipe(sourcemaps.init())
   .pipe(sass().on('error', sass.logError))
 	.pipe(gulp.dest('./public/css')); 
