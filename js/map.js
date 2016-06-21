@@ -29,10 +29,10 @@ function initialize() {
 
   
   // Create dynamic drop down menu for serverLocs
-  document.getElementById("serverAddress").options[0]=new Option("Please select an address");
+  document.getElementById("serverNames").options[0]=new Option("Please select an address");
   for (var i = 0; i < serverLocs.length; i++) {
     var serverLoc = serverLocs[i];
-    document.getElementById("serverAddress").options[ i + 1 ]=new Option(serverLoc.name);
+    document.getElementById("serverNames").options[ i + 1 ]=new Option(serverLoc.name);
   }  
 
   // Add event listener to submit button
@@ -113,9 +113,9 @@ function setNetworkLine(map, pt1, pt2, color, distOn){
 // Call findClosestServer
 function geocodeAddress (geocoder, resultsMap) {
   var clientAddress = document.getElementById('clientAddress').value;
-  var serverOptions = document.getElementById('serverAddress');
-  var serverValue = serverOptions.options[serverOptions.selectedIndex].value;
-  console.log('serverValue: ', serverValue);
+  var serverOptions = document.getElementById('serverNames');
+  var serverName = serverOptions.options[serverOptions.selectedIndex].value;
+  console.log('serverName: ', serverName);
 
   geocoder.geocode({'address': clientAddress}, function(results, status) {
     if (status === google.maps.GeocoderStatus.OK) {
@@ -135,6 +135,13 @@ function geocodeAddress (geocoder, resultsMap) {
       // Find closest server & set line
       closestObj = findClosestServer(clientLoc.lat, clientLoc.lng);
       setNetworkLine(resultsMap, clientLoc, closestObj.server, 'green', false);
+
+      if(closestObj.server.name == serverName){
+        console.log('You chose the closest server');
+      } else {
+        console.log('your server is not the closest');
+        findShortestRoute(closestObj.server.name, serverName);
+      }
 
     } else {
       alert('Geocode was not successful for the following reason: ' + status);
@@ -173,8 +180,53 @@ function findClosestServer (lat, lng) {
   }
 
   return closestObj;
-
 };
+
+// FIND SHORTEST ROUTE
+function findShortestRoute (server1, server2){
+  console.log('findShortestRoute hit!');
+  console.log('server1 is: ', server1);
+  console.log('server2 is: ', server2);
+  var server2Match = false;
+
+  var route1 = ["Atlanta", "Dallas", "Los Angeles", "Seattle", "Chicago", "New York", "Washington DC"]; // main loop CW
+  var route2 = ["Atlanta", "Washington DC", "New York", "Chicago", "Seattle", "Los Angeles", "Dallas"]; // main loop CCW
+  var route3 = ["Atlanta", "Miami", "Dallas"]; // small loop CW
+  var route4 = ["Atlanta", "Dallas", "Miami"]; // small loop CCW
+
+  if(server1 != "Miami" || server2 != "Miami"){
+    for(var i=0; i<route1.length; i++){
+      if (server1 == route1[i]){
+        console.log('route1[i] matches server 1: ', route1[i]);
+
+        for(var j=i+1; j<route1.length; j++){
+          if(server2 == route1[j]){
+            console.log('route1[j] matches server 2: ', route1[j]);
+            server2Match = true;
+            break;
+          } else {
+            console.log('route1[j] does not match server2; keep looping: ', route1[j]);
+          }
+        }
+
+        if(!server2Match){
+          for(var j=0; j<route1.length; j++){
+            if(server2 == route1[j]){
+              console.log('route1[j] matches server 2: ', route1[j]);
+              server2Match = true;
+              break;
+            } else {
+              console.log('route1[j] does not match server2; keep looping: ', route1[j]);
+            }
+          }
+        }
+
+      }
+    }
+  }
+
+
+}
 
 // ON LOAD INITIALIZATION ************************************************
 google.maps.event.addDomListener(window, 'load', initialize);
