@@ -24,5 +24,5 @@ gulp.task('css:build', ['cssBuild']);
 
 // CSS Watch (Called in gulpfile):
 gulp.task('css:watch', ['css:build'], function () {
-	gulp.watch('./css/**/*.scss', ['css:build']);
+	gulp.watch('sass/**/*.scss', ['css:build']);
 });

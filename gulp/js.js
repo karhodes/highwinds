@@ -19,5 +19,5 @@ gulp.task('js:build', function () {
 
 // JS Watch (Called in gulpfile):
 gulp.task('js:watch', ['js:build'], function () {
-  gulp.watch('js/*.js', ['js:build']);
+  gulp.watch(['js/*.js'], ['js:build']);
 });

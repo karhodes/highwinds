@@ -1,3 +1,5 @@
+// initializes Google map, drops points for service locations (pops), 
+// calculates distance and draws lines between pops
 function initialize() {
   // create new google map
   var usaLat = 37.09024;
@@ -11,40 +13,40 @@ function initialize() {
     mapOptions);
 
   setMarkers(map);
-  setNetworkLine(map, pops[0], pops[1]); // NY to DC
-  setNetworkLine(map, pops[1], pops[2]); // DC to Atl
-  setNetworkLine(map, pops[2], pops[7]); // Atl to Mia
-  setNetworkLine(map, pops[2], pops[3]); // Atl to DFW
-  setNetworkLine(map, pops[3], pops[7]); // DFW to Mia
-  setNetworkLine(map, pops[3], pops[4]); // DFW to LAX
-  setNetworkLine(map, pops[4], pops[6]); // LAX to Seattle
-  setNetworkLine(map, pops[6], pops[5]); // Seattle to Chicago
-  setNetworkLine(map, pops[5], pops[0]); // Chicago to NYC
+  setNetworkLine(map, serverLocs[0], serverLocs[1]); // NY to DC
+  setNetworkLine(map, serverLocs[1], serverLocs[2]); // DC to Atl
+  setNetworkLine(map, serverLocs[2], serverLocs[7]); // Atl to Mia
+  setNetworkLine(map, serverLocs[2], serverLocs[3]); // Atl to DFW
+  setNetworkLine(map, serverLocs[3], serverLocs[7]); // DFW to Mia
+  setNetworkLine(map, serverLocs[3], serverLocs[4]); // DFW to LAX
+  setNetworkLine(map, serverLocs[4], serverLocs[6]); // LAX to Seattle
+  setNetworkLine(map, serverLocs[6], serverLocs[5]); // Seattle to Chicago
+  setNetworkLine(map, serverLocs[5], serverLocs[0]); // Chicago to NYC
 
-  // create markers for points of presence (pops)
+  // create markers for points of presence (serverLocs)
   function setMarkers(map){
     var shape = {
       coords: [1, 1, 1, 20, 18, 20, 18, 1],
       type: 'poly'
     };
 
-    for (var i = 0; i < pops.length; i++) {
-      var pop = pops[i];
+    for (var i = 0; i < serverLocs.length; i++) {
+      var serverLoc = serverLocs[i];
       var marker = new google.maps.Marker({
-        position: {lat: pop[1], lng: pop[2]},
+        position: {lat: serverLoc.lat, lng: serverLoc.lng},
         map: map,
         shape: shape,
-        title: pop[0],
+        title: serverLoc.name,
       });
     };  
   };
 
   // create "network" connections
   function setNetworkLine(map, pt1, pt2){
-    var pt1Lat = pt1[1];
-    var pt1Long = pt1[2];
-    var pt2Lat = pt2[1];
-    var pt2Long = pt2[2];
+    var pt1Lat = pt1.lat;
+    var pt1Long = pt1.lng;
+    var pt2Lat = pt2.lat;
+    var pt2Long = pt2.lng;
 
     latLng1 = new google.maps.LatLng(pt1Lat, pt1Long);
     latLng2 = new google.maps.LatLng(pt2Lat, pt2Long);
@@ -70,6 +72,7 @@ function initialize() {
     // calculate distance between two points
     var dist = distance(pt1Lat, pt1Long, pt2Lat, pt2Long);
     
+    // place mapLabel on map
     var mapLabel = new MapLabel({
       text: dist + ' mi',
       position: inBetween,
