@@ -8,13 +8,36 @@ angular.module("locApp",[])
       serverLocs: serverLocs
      };
 
+     $scope.clientLoc = {};
+
     $scope.onSubmit = function(){
-      console.log("i was clicked!");
+      console.log($scope.clientLoc);
+      clientLocSvc.addClientLoc($scope.clientLoc);
+      console.log('$scope.clientLoc inside onSubmit - ctrl: ', $scope.clientLoc);
+      $scope.clientLoc = {};
     }
 
-  }) // clientLocCtrl
+    $scope.clientLocArray = clientLocSvc.fetchAllClientLoc();
+
+  }) // closes clientLocCtrl
 
   .service("clientLocSvc",function(){
     console.log("clientLocSvc loaded");
+
+    clientLocArray = [];
+
+    this.addClientLoc = function(pItem){
+      console.log('this.addClientLoc touched');
+      clientLocArray.push(pItem);
+      console.log('clientLocArray: ', clientLocArray);
+      var str = JSON.stringify(clientLocArray);
+      localStorage.setItem("clientLocArray", str);
+    }
+
+    this.fetchAllClientLoc = function(){
+      var str = localStorage.getItem("clientLocArray", str);
+      clientLocArray = JSON.parse(str);
+      return clientLocArray;
+    }
 
   }) // closes clientLocSvc 
