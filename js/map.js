@@ -140,7 +140,7 @@ function geocodeAddress (geocoder, resultsMap) {
         console.log('You chose the closest server');
       } else {
         console.log('your server is not the closest');
-        findShortestRoute(closestObj.server.name, serverName);
+        findShortestRoute(closestObj.server.name, serverName, resultsMap);
       }
 
     } else {
@@ -183,49 +183,63 @@ function findClosestServer (lat, lng) {
 };
 
 // FIND SHORTEST ROUTE
-function findShortestRoute (server1, server2){
+// TODO:  implement logic for shortest route
+// currently uses a default route to get from server1 to server2
+// calculates the distance between server 1 & server2
+// plots "network" connections between server1 & server2
+function findShortestRoute (server1, server2, resultsMap){
   console.log('findShortestRoute hit!');
   console.log('server1 is: ', server1);
   console.log('server2 is: ', server2);
   var server2Match = false;
 
-  var route1 = ["Atlanta", "Dallas", "Los Angeles", "Seattle", "Chicago", "New York", "Washington DC"]; // main loop CW
-  var route2 = ["Atlanta", "Washington DC", "New York", "Chicago", "Seattle", "Los Angeles", "Dallas"]; // main loop CCW
-  var route3 = ["Atlanta", "Miami", "Dallas"]; // small loop CW
-  var route4 = ["Atlanta", "Dallas", "Miami"]; // small loop CCW
+  var route = ["Atlanta", "Miami", "Dallas", "Los Angeles", "Seattle", "Chicago", "New York", "Washington DC"]; // main loop CW
+  var dist = 0;
+  var pt1 = {};
+  var pt2 = {};
 
-  if(server1 != "Miami" || server2 != "Miami"){
-    for(var i=0; i<route1.length; i++){
-      if (server1 == route1[i]){
-        console.log('route1[i] matches server 1: ', route1[i]);
+  for(var i=0; i<route.length; i++){
+    if (server1 == route[i]){
+      pt1 = getByName(serverLocs, route[i]);
 
-        for(var j=i+1; j<route1.length; j++){
-          if(server2 == route1[j]){
-            console.log('route1[j] matches server 2: ', route1[j]);
+      for(var j=i+1; j<route.length; j++){
+        if(server2 == route[j]){
+          pt2 = getByName(serverLocs, route[j]);
+          setNetworkLine(resultsMap, pt1, pt2, "green", false);
+          server2Match = true;
+          break;
+        } else {
+          pt2 = getByName(serverLocs, route[j]);
+          setNetworkLine(resultsMap, pt1, pt2, "green", false);
+          pt1 = getByName(serverLocs, route[j]);
+        }
+      }
+
+      if(!server2Match){
+        console.log(pt1.name, pt2.name);
+        for(var j=0; j<route.length; j++){
+          if(server2 == route[j]){
+            pt2 = getByName(serverLocs, route[j]);
+            setNetworkLine(resultsMap, pt1, pt2, "green", false);
             server2Match = true;
             break;
           } else {
-            console.log('route1[j] does not match server2; keep looping: ', route1[j]);
+            pt2 = getByName(serverLocs, route[j]);
+            setNetworkLine(resultsMap, pt1, pt2, "green", false);
+            pt1 = getByName(serverLocs, route[j]);
           }
         }
-
-        if(!server2Match){
-          for(var j=0; j<route1.length; j++){
-            if(server2 == route1[j]){
-              console.log('route1[j] matches server 2: ', route1[j]);
-              server2Match = true;
-              break;
-            } else {
-              console.log('route1[j] does not match server2; keep looping: ', route1[j]);
-            }
-          }
-        }
-
       }
     }
+  }  
+}
+
+// GET BY NAME
+// loops over array of objects to find with matching name (i.e. Atlanta, Miama...)
+function getByName(arr, value) {
+  for (var i=0; i<arr.length; i++) {
+    if (arr[i].name == value) return arr[i];
   }
-
-
 }
 
 // ON LOAD INITIALIZATION ************************************************
