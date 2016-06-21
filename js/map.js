@@ -1,3 +1,5 @@
+// initializes Google map, drops points for service locations (pops), 
+// calculates distance and draws lines between pops
 function initialize() {
   // create new google map
   var usaLat = 37.09024;
@@ -70,6 +72,7 @@ function initialize() {
     // calculate distance between two points
     var dist = distance(pt1Lat, pt1Long, pt2Lat, pt2Long);
     
+    // place mapLabel on map
     var mapLabel = new MapLabel({
       text: dist + ' mi',
       position: inBetween,
