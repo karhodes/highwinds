@@ -38,6 +38,7 @@ function initialize() {
   // Add event listener to submit button
   document.getElementById('submit').addEventListener('click', function() {
     geocodeAddress(geocoder, map);
+    appendToClientServerPairs();
   });
 };
 
@@ -115,7 +116,6 @@ function geocodeAddress (geocoder, resultsMap) {
   var clientAddress = document.getElementById('clientAddress').value;
   var serverOptions = document.getElementById('serverNames');
   var serverName = serverOptions.options[serverOptions.selectedIndex].value;
-  console.log('serverName: ', serverName);
 
   geocoder.geocode({'address': clientAddress}, function(results, status) {
     if (status === google.maps.GeocoderStatus.OK) {
@@ -136,10 +136,7 @@ function geocodeAddress (geocoder, resultsMap) {
       closestObj = findClosestServer(clientLoc.lat, clientLoc.lng);
       setNetworkLine(resultsMap, clientLoc, closestObj.server, 'green', false);
 
-      if(closestObj.server.name == serverName){
-        console.log('You chose the closest server');
-      } else {
-        console.log('your server is not the closest');
+      if(closestObj.server.name != serverName){
         findShortestRoute(closestObj.server.name, serverName, resultsMap);
       }
 
@@ -188,13 +185,10 @@ function findClosestServer (lat, lng) {
 // calculates the distance between server 1 & server2
 // plots "network" connections between server1 & server2
 function findShortestRoute (server1, server2, resultsMap){
-  console.log('findShortestRoute hit!');
-  console.log('server1 is: ', server1);
-  console.log('server2 is: ', server2);
   var server2Match = false;
 
   var route = ["Atlanta", "Miami", "Dallas", "Los Angeles", "Seattle", "Chicago", "New York", "Washington DC"]; // main loop CW
-  var dist = 0;
+  var routeDist = 0;
   var pt1 = {};
   var pt2 = {};
 
@@ -205,34 +199,56 @@ function findShortestRoute (server1, server2, resultsMap){
       for(var j=i+1; j<route.length; j++){
         if(server2 == route[j]){
           pt2 = getByName(serverLocs, route[j]);
+          routeDist += distance(pt1.lat, pt1.lng, pt2.lat, pt2.lng);
           setNetworkLine(resultsMap, pt1, pt2, "green", false);
           server2Match = true;
           break;
         } else {
           pt2 = getByName(serverLocs, route[j]);
+          routeDist += distance(pt1.lat, pt1.lng, pt2.lat, pt2.lng);
           setNetworkLine(resultsMap, pt1, pt2, "green", false);
           pt1 = getByName(serverLocs, route[j]);
         }
       }
 
       if(!server2Match){
-        console.log(pt1.name, pt2.name);
         for(var j=0; j<route.length; j++){
           if(server2 == route[j]){
             pt2 = getByName(serverLocs, route[j]);
+            routeDist += distance(pt1.lat, pt1.lng, pt2.lat, pt2.lng);
             setNetworkLine(resultsMap, pt1, pt2, "green", false);
             server2Match = true;
             break;
           } else {
             pt2 = getByName(serverLocs, route[j]);
+            routeDist += distance(pt1.lat, pt1.lng, pt2.lat, pt2.lng);
             setNetworkLine(resultsMap, pt1, pt2, "green", false);
             pt1 = getByName(serverLocs, route[j]);
           }
         }
       }
     }
-  }  
+  }
+
+  console.log('the total distance is: ', routeDist); 
 }
+
+// APPEND TO CLIENT SERVER PAIRS
+function appendToClientServerPairs(){
+  var clientAddress = document.getElementById('clientAddress').value;
+  var serverOptions = document.getElementById('serverNames');
+  var serverName = serverOptions.options[serverOptions.selectedIndex].value;
+
+  console.log('clientAddress: ', clientAddress);
+  console.log('serverName: ', serverName);
+
+  var div = document.getElementById('clientServerPairs');
+
+  div.innerHTML = div.innerHTML + 'Extra stuff';
+
+
+}
+
 
 // GET BY NAME
 // loops over array of objects to find with matching name (i.e. Atlanta, Miama...)
