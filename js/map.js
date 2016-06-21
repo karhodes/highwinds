@@ -128,6 +128,27 @@ function geocodeAddress (geocoder, resultsMap) {
 
 function findClosestServer (clientLat, clientLng) {
   console.log("im finding the closest!");
+  var closestServer = {};
+  var calcDist = [];
+  var closestDist = 0;
+
+  for (var i = 0; i < serverLocs.length; i++) {
+    var serverLoc = serverLocs[i];
+    calcDist[i] = distance(clientLat, clientLng, serverLoc.lat, serverLoc.lng);
+  }; 
+
+  closestDist = calcDist[0];
+  closestServer = serverLocs[0];
+
+  for (var i = 1; i < calcDist.length; i++) {
+    if (calcDist[i] < closestDist){
+      closestDist = calcDist[i];
+      closestServer = serverLocs[i];
+    }
+  } 
+
+  console.log('the closest server is : ', closestServer.name);
+  console.log('the closest server is ', closestDist, ' miles away'); 
 
 
 
