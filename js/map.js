@@ -1,5 +1,7 @@
 // initializes Google map, drops points for service locations (pops), 
 // calculates distance and draws lines between pops
+// adds new marker based on user input
+// creates dynamic drop-down menu based on service locations
 function initialize() {
   // create new google map
   var usaLat = 37.09024;
@@ -85,27 +87,51 @@ function initialize() {
     mapLabel.set('position', inBetween);
   };
 
+  // create dynamic drop down menu for serverLocs
+  document.getElementById("serverAddress").options[0]=new Option("Please select an address");
+  for (var i = 0; i < serverLocs.length; i++) {
+    var serverLoc = serverLocs[i];
+    document.getElementById("serverAddress").options[ i + 1 ]=new Option(serverLoc.name);
+  }  
+
   document.getElementById('submit').addEventListener('click', function() {
-    console.log('I was clicked');
     geocodeAddress(geocoder, map);
   });
 };
 
 // geocode (translate address string to lat / lng & place marker)
-function geocodeAddress(geocoder, resultsMap) {
-  var address = document.getElementById('address').value;
-  console.log('address inside geocodeAddress function: ', address);
-  geocoder.geocode({'address': address}, function(results, status) {
+function geocodeAddress (geocoder, resultsMap) {
+  var clientAddress = document.getElementById('clientAddress').value;
+  var serverOptions = document.getElementById('serverAddress');
+  var serverValue = serverOptions.options[serverOptions.selectedIndex].value;
+  console.log('serverValue: ', serverValue);
+
+  geocoder.geocode({'address': clientAddress}, function(results, status) {
     if (status === google.maps.GeocoderStatus.OK) {
-      resultsMap.setCenter(results[0].geometry.location);
+      clientLat = results[0].geometry.location.lat();
+      clientLng = results[0].geometry.location.lng();
+
+      // set new marker
       var marker = new google.maps.Marker({
         map: resultsMap,
         position: results[0].geometry.location
       });
+
+      // find closest server
+      findClosestServer(clientLat, clientLng);
+
     } else {
       alert('Geocode was not successful for the following reason: ' + status);
     }
   });
+}
+
+function findClosestServer (clientLat, clientLng) {
+  console.log("im finding the closest!");
+
+
+
+
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
