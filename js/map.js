@@ -242,9 +242,11 @@ function appendToClientServerPairs(){
   console.log('clientAddress: ', clientAddress);
   console.log('serverName: ', serverName);
 
+  var newRow = "<tr><td>" + serverName + "</td><td>" + clientAddress + "</td></tr>";
+
   var div = document.getElementById('clientServerPairs');
 
-  div.innerHTML = div.innerHTML + 'Extra stuff';
+  div.innerHTML = div.innerHTML + newRow;
 
 
 }
