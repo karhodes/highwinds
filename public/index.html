@@ -23,11 +23,11 @@
 <body ng-app="locApp">
   <div class="container"> 
     <h1>Highwinds Network Map</h1>
-    <div class='col-md-6'>
+    <div class='col-md-12'>
       <div id='map'></div>
     </div>
     
-    <div class='col-md-6' ng-controller="ClientLocCtrl">
+    <div class='col-md-12' ng-controller="ClientLocCtrl">
       <form class="form-horizontal" ng-submit="onSubmit()">
         <label for="repeatSelect" class="col-sm-2 control-label">Server Location:</label>
         <div class="col-sm-10">
@@ -54,5 +54,11 @@
       </div>  
 
     </div> 
+
+    <div>
+        <input id='address' type='textbox' value=''>
+        <input id='submit' type='button' value='Geocode'>
+    </div>
+
   </div><!-- /container --> 
 </body>
