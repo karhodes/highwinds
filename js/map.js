@@ -12,6 +12,8 @@ function initialize() {
   var map = new google.maps.Map(document.getElementById('map'),
     mapOptions);
 
+  var geocoder = new google.maps.Geocoder();
+
   setMarkers(map);
   setNetworkLine(map, serverLocs[0], serverLocs[1]); // NY to DC
   setNetworkLine(map, serverLocs[1], serverLocs[2]); // DC to Atl
@@ -82,7 +84,29 @@ function initialize() {
 
     mapLabel.set('position', inBetween);
   };
+
+  document.getElementById('submit').addEventListener('click', function() {
+    console.log('I was clicked');
+    geocodeAddress(geocoder, map);
+  });
 };
+
+// geocode (translate address string to lat / lng & place marker)
+function geocodeAddress(geocoder, resultsMap) {
+  var address = document.getElementById('address').value;
+  console.log('address inside geocodeAddress function: ', address);
+  geocoder.geocode({'address': address}, function(results, status) {
+    if (status === google.maps.GeocoderStatus.OK) {
+      resultsMap.setCenter(results[0].geometry.location);
+      var marker = new google.maps.Marker({
+        map: resultsMap,
+        position: results[0].geometry.location
+      });
+    } else {
+      alert('Geocode was not successful for the following reason: ' + status);
+    }
+  });
+}
 
 google.maps.event.addDomListener(window, 'load', initialize);
 
