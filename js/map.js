@@ -46,7 +46,7 @@ angular.module('mapsApp', [])
 
     // Place intial network lines on map
     for (var i=0; i<(route.length-1); i++){
-      networkline = createNetworkLine(route[i], route[(i + 1)], '#FF1A1A');
+      networkline = createNetworkLine(route[i], route[(i + 1)], '#FF1A1A', 2);
       networkline.setMap($scope.map);
       placeDistance($scope.map, route[i], route[(i + 1)]);
     }
@@ -141,7 +141,7 @@ var createMarker = function (info, map) {
 // Create "network" connections between two points
 // Calculate the distance between two points
 // Add distance value to map if distOn is true
-var createNetworkLine = function (pt1, pt2, color) {
+var createNetworkLine = function (pt1, pt2, color, strokeWeight) {
   var latLng1 = new google.maps.LatLng(pt1.lat, pt1.lng);
   var latLng2 = new google.maps.LatLng(pt2.lat, pt2.lng);
 
@@ -155,7 +155,7 @@ var createNetworkLine = function (pt1, pt2, color) {
     geodesic: true,
     strokeColor: color,
     strokeOpacity: 1.0,
-    strokeWeight: 2,
+    strokeWeight: strokeWeight,
   });
 
   return networkPath;
@@ -200,7 +200,7 @@ var geocodeAddress = function (geocoder, map, route, clientAddress, finalServerN
 
       // Find closest server & set line
       closestServer = findClosestServer(clientLoc.lat, clientLoc.lng);
-      clientToServerLine = createNetworkLine(clientLoc, closestServer, 'green');
+      clientToServerLine = createNetworkLine(clientLoc, closestServer, '#022659', 3);
       currentClientToServerRoute.push(clientToServerLine);
       clientToServerLine.setMap(map);
 
@@ -258,7 +258,7 @@ var createRouteServerToServer = function (server1, server2, map, route, currentC
       for(var j=i+1; j<route.length; j++){
         pt2 = route[j];
         routeDist += distance(pt1.lat, pt1.lng, pt2.lat, pt2.lng);
-        serverToServerLine = createNetworkLine(pt1, pt2, "green");
+        serverToServerLine = createNetworkLine(pt1, pt2, "#022659", 3);
         serverToServerLine.setMap(map);
         currentClientToServerRoute.push(serverToServerLine);
 
