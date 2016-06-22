@@ -17,7 +17,11 @@ angular.module('mapsApp', [])
 
     $scope.viewPair = function(idx){
       MapSvc.viewPair(idx);
-    };    
+    };  
+
+    $scope.deletePair = function(idx){
+      MapSvc.deletePair(idx);
+    }  
 
     // Map Variables:
     var usaLat = 37.09024;
@@ -81,6 +85,12 @@ angular.module('mapsApp', [])
       // TODO:  remove previous route added and only display clicked route
     }
 
+    this.deletePair = function(pIndex){
+      console.log("delete was clicked!");
+      clientServerPairs.splice(pIndex,1);
+      var str = JSON.stringify(clientServerPairs);
+      localStorage.setItem("clientServerPairs",str);
+    }
 
   });  
 
