@@ -28,7 +28,7 @@
     </div>
 
     <div>
-      <form ng-submit="onSubmit()">
+      <form ng-submit="$emit('onSubmit')">
         <div class='form-group'>
           <label for="serverNames">Server Location</label>
           <select id='serverNames' class="form-control" ng-model='pair.server'>

@@ -13,8 +13,6 @@ angular.module('mapsApp', [])
         zoom : 4,
         center : usaLatlng
     };
-    var currentClientToServerRoute = [];
-    var currentClientMarker = {};
 
     // Single outer CW route to pass through each point
     // Used for network lines
@@ -50,21 +48,30 @@ angular.module('mapsApp', [])
       placeDistance($scope.map, route[i], route[(i + 1)]);
     }
 
-    // For Map Interactivity (Accept client / server pairs & plot):
+    // For map interactivity (accept client / server pairs & plot):
     $scope.pair = {};
     $scope.serverLocs = serverLocs;
     $scope.clientServerPairs = MapSvc.getPairs();
+    $scope.currentClientToServerRoute = [];
+    $scope.currentClientMarker = {};
 
-    $scope.onSubmit = function(){
-      currentClientToServerRoute = geocodeAddress($scope.geocoder, $scope.map, route, $scope.pair.client, $scope.pair.server, currentClientToServerRoute);
-      console.log('currentClientToServerRoute: ', currentClientToServerRoute);
+    $scope.$on('onSubmit', function() {
+      $scope.currentClientToServerRoute = geocodeAddress($scope.geocoder, $scope.map, route, $scope.pair.client, $scope.pair.server, $scope.currentClientToServerRoute);
+      console.log('$scope.currentClientToServerRoute: ', $scope.currentClientToServerRoute);
       MapSvc.addPair($scope.pair);
       $scope.pair = {};
-    }
+    });
+
+    /*$scope.onSubmit = function(){
+      $scope.currentClientToServerRoute = geocodeAddress($scope.geocoder, $scope.map, route, $scope.pair.client, $scope.pair.server, currentClientToServerRoute);
+      console.log('$scope.currentClientToServerRoute: ', $scope.currentClientToServerRoute);
+      MapSvc.addPair($scope.pair);
+      $scope.pair = {};
+    }*/
 
     $scope.viewPair = function(idx){
       MapSvc.viewPair(idx);
-      console.log('currentClientToServerRoute: ', currentClientToServerRoute);
+      console.log('$scope.currentClientToServerRoute: ', $scope.currentClientToServerRoute);
     };  
 
     $scope.deletePair = function(idx){
