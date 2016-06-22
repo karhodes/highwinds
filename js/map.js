@@ -55,26 +55,16 @@ angular.module('mapsApp', [])
     $scope.pair = {};
     $scope.serverLocs = serverLocs;
     $scope.clientServerPairs = MapSvc.getPairs();
-    $scope.currentClientToServerRoute = [];
-    $scope.currentClientMarker = {};
 
     $scope.$on('onSubmit', function() {
-      $scope.currentClientToServerRoute = geocodeAddress($scope.geocoder, $scope.map, route, $scope.pair.client, $scope.pair.server, $scope.currentClientToServerRoute);
-      console.log('$scope.currentClientToServerRoute: ', $scope.currentClientToServerRoute);
+      geocodeAddress($scope.geocoder, $scope.map, route, $scope.pair.client, $scope.pair.server);
       MapSvc.addPair($scope.pair);
       $scope.pair = {};
     });
 
-    /*$scope.onSubmit = function(){
-      $scope.currentClientToServerRoute = geocodeAddress($scope.geocoder, $scope.map, route, $scope.pair.client, $scope.pair.server, currentClientToServerRoute);
-      console.log('$scope.currentClientToServerRoute: ', $scope.currentClientToServerRoute);
-      MapSvc.addPair($scope.pair);
-      $scope.pair = {};
-    }*/
-
     $scope.viewPair = function(idx){
-      MapSvc.viewPair(idx);
-      console.log('$scope.currentClientToServerRoute: ', $scope.currentClientToServerRoute);
+      currentPair = MapSvc.viewPair(idx);
+      geocodeAddress($scope.geocoder, $scope.map, route, currentPair.client, currentPair.server);
     };  
 
     $scope.deletePair = function(idx){
@@ -97,8 +87,9 @@ angular.module('mapsApp', [])
     }
 
     this.viewPair = function(pIndex){
-      console.log('i was clicked!');
-      // TODO:  remove previous route added and only display clicked route
+      var str = localStorage.getItem("clientServerPairs", str);
+      clientServerPairs = JSON.parse(str);
+      return clientServerPairs[pIndex];
     }
 
     this.deletePair = function(pIndex){
@@ -187,7 +178,7 @@ var placeDistance = function (map, pt1, pt2) {
 // GEOCODE ADDRESS ***************************************************** 
 // Translate client address string to lat / lng & place marker)
 // Call findClosestServer() & createNetworkLine to that server
-var geocodeAddress = function (geocoder, map, route, clientAddress, finalServerName, currentClientToServerRoute) {
+var geocodeAddress = function (geocoder, map, route, clientAddress, finalServerName) {
   geocoder.geocode({'address': clientAddress}, function(results, status) {
     if (status === google.maps.GeocoderStatus.OK) {
       clientLoc = {
@@ -201,15 +192,15 @@ var geocodeAddress = function (geocoder, map, route, clientAddress, finalServerN
       // Find closest server & set line
       closestServer = findClosestServer(clientLoc.lat, clientLoc.lng);
       clientToServerLine = createNetworkLine(clientLoc, closestServer, '#0024F2', 3);
-      currentClientToServerRoute.push(clientToServerLine);
+      //currentClientToServerRoute.push(clientToServerLine);
       clientToServerLine.setMap(map);
 
       if(closestServer.name != finalServerName){
-        currentClientToServerRoute = createRouteServerToServer(closestServer.name, finalServerName, map, route, currentClientToServerRoute);
+        createRouteServerToServer(closestServer.name, finalServerName, map, route);
+        //currentClientToServerRoute = createRouteServerToServer(closestServer.name, finalServerName, map, route, currentClientToServerRoute);
       };
 
-      console.log('currentClientToServerRoute: ', currentClientToServerRoute);
-      return currentClientToServerRoute;
+      // return currentClientToServerRoute;
 
     } else {
       alert('Geocode was not successful for the following reason: ' + status);
@@ -245,7 +236,7 @@ var findClosestServer = function (clientLat, clientLng) {
 // TODO:  implement logic for shortest route
 // calculates the distance between server1 & server2
 // plots "network" connections between server1 & server2
-var createRouteServerToServer = function (server1, server2, map, route, currentClientToServerRoute) {
+var createRouteServerToServer = function (server1, server2, map, route) {
   var server2Match = false;
   var routeDist = 0;
   var pt1 = {};
@@ -260,7 +251,7 @@ var createRouteServerToServer = function (server1, server2, map, route, currentC
         routeDist += distance(pt1.lat, pt1.lng, pt2.lat, pt2.lng);
         serverToServerLine = createNetworkLine(pt1, pt2, "#0024F2", 3);
         serverToServerLine.setMap(map);
-        currentClientToServerRoute.push(serverToServerLine);
+        // currentClientToServerRoute.push(serverToServerLine);
 
         if(server2 == route[j].name){
           server2Match = true;
@@ -277,5 +268,5 @@ var createRouteServerToServer = function (server1, server2, map, route, currentC
     };
   };
   console.log('and the total distance is... ', routeDist);
-  return currentClientToServerRoute; 
+  // return currentClientToServerRoute; 
 };
