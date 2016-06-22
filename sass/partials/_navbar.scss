@@ -1,0 +1,19 @@
+.navbar.navbar-default{
+  min-height: 80px;
+  line-height: 80px;
+  margin-bottom: 0px;
+}
+
+
+.navbar-default .navbar-nav>li>a{
+  font-family: $base-font-family;
+  font-size: 14.4px;
+  font-weight: bold;
+  color: $gray1;
+  padding: 30px;
+}
+
+.navbar-default .navbar-nav>li>a:hover{
+  background-color: $red;
+  color: $white;
+}

@@ -14,6 +14,8 @@ angular.module('mapsApp', [])
         center : usaLatlng
     };
 
+    var mapStyles = [{"featureType": "landscape", "stylers": [{"saturation": -100}, {"lightness": 65}, {"visibility": "on"}]}, {"featureType": "poi", "stylers": [{"saturation": -100}, {"lightness": 51}, {"visibility": "simplified"}]}, {"featureType": "road.highway", "stylers": [{"saturation": -100}, {"visibility": "simplified"}]}, {"featureType": "road.arterial", "stylers": [{"saturation": -100}, {"lightness": 30}, {"visibility": "on"}]}, {"featureType": "road.local", "stylers": [{"saturation": -100}, {"lightness": 40}, {"visibility": "on"}]}, {"featureType": "transit", "stylers": [{"saturation": -100}, {"visibility": "simplified"}]}, {"featureType": "administrative.province", "stylers": [{"visibility": "off"}]}, {"featureType": "water", "elementType": "labels", "stylers": [{"visibility": "on"}, {"lightness": -25}, {"saturation": -100}]}, {"featureType": "water", "elementType": "geometry", "stylers": [{"hue": "#c7d6dd"}, {"lightness": -25}, {"saturation": -97}]}];
+
     // Single outer CW route to pass through each point
     // Used for network lines
     // TODO: create logic to generate network map dynamically 
@@ -34,6 +36,7 @@ angular.module('mapsApp', [])
 
     // Load map & geocoder
     $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
+    $scope.map.set('styles', mapStyles);
     $scope.geocoder = new google.maps.Geocoder();
     
     // Place markers on map
@@ -43,7 +46,7 @@ angular.module('mapsApp', [])
 
     // Place intial network lines on map
     for (var i=0; i<(route.length-1); i++){
-      networkline = createNetworkLine(route[i], route[(i + 1)], 'red');
+      networkline = createNetworkLine(route[i], route[(i + 1)], '#FF1A1A');
       networkline.setMap($scope.map);
       placeDistance($scope.map, route[i], route[(i + 1)]);
     }

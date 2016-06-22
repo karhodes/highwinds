@@ -1,1 +1,9 @@
+@font-face {
+  font-family: "Karla";
+  src: url("../assets/fonts/karla/Karla-Regular.ttf");
+}
 
+h1{
+  font-family: $base-font-family;
+  text-align: center;
+}
