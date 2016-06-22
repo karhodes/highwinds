@@ -19,6 +19,28 @@ h1 {
 .required-label {
   color: #FF1A1A; }
 
+.btn {
+  border: none;
+  border-radius: 0px; }
+
+.btn-primary {
+  background-color: #022659;
+  color: #FFF; }
+
+.btn-primary:hover {
+  background-color: #0024F2;
+  color: #FFF;
+  border: none; }
+
+.btn-danger {
+  background-color: #CC1515;
+  color: #FFF; }
+
+.btn-danger:hover {
+  background-color: #FF1A1A;
+  color: #FFF;
+  border: none; }
+
 #logo {
   height: 50px;
   width: 90px; }
