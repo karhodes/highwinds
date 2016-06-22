@@ -5,7 +5,19 @@
 // Creates dynamic drop-down menu based on service locations
 angular.module('mapsApp', [])
   .controller('MapCtrl', function ($scope, MapSvc) {
+    $scope.pair = {};
+    $scope.serverLocs = serverLocs;
     $scope.clientServerPairs = MapSvc.getPairs();
+
+    $scope.onSubmit = function(){
+      geocodeAddress($scope.geocoder, $scope.map, route, $scope.pair.client, $scope.pair.server);
+      MapSvc.addPair($scope.pair);
+      $scope.pair = {};
+    }
+
+    $scope.viewPair = function(idx){
+      MapSvc.viewPair(idx);
+    };    
 
     // Map Variables:
     var usaLat = 37.09024;
@@ -18,6 +30,8 @@ angular.module('mapsApp', [])
 
     // Single CW route to pass through each point
     // Used for network lines
+    // TODO: create logic to generate network map dynamically 
+    // based on nearest neighbors
     var route = [
       getByName(serverLocs, "Atlanta"),
       getByName(serverLocs, "Dallas"),
@@ -44,31 +58,13 @@ angular.module('mapsApp', [])
     for (var i=0; i<(route.length-1); i++){
       createNetworkLine($scope.map, route[i], route[(i + 1)], 'red', true);
     }
-    
-    // Create dynamic drop down menu for serverLocs
-    document.getElementById("serverNames").options[0]=new Option("Please select an address");
-    for (var i = 0; i < serverLocs.length; i++) {
-      var serverLoc = serverLocs[i];
-      document.getElementById("serverNames").options[ i + 1 ]=new Option(serverLoc.name);
-    }  
-
-    // Add event listener to submit button
-    document.getElementById('submit').addEventListener('click', function() {
-      var clientAddress = document.getElementById('clientAddress').value;
-      var serverOptions = document.getElementById('serverNames');
-      var serverName = serverOptions.options[serverOptions.selectedIndex].value;
-
-      geocodeAddress($scope.geocoder, $scope.map, route, clientAddress, serverName);
-      MapSvc.addPair(clientAddress, serverName);
-      //appendToClientServerPairs(clientServerPairs);
-    });
-
+     
   })
   .service("MapSvc", function(){
     var clientServerPairs = [];
 
-    this.addPair = function (clientAddress, serverName) {
-      clientServerPairs.push({'clientAddress': clientAddress, 'serverName': serverName});
+    this.addPair = function (pair) {
+      clientServerPairs.push({'client': pair.client, 'server': pair.server});
       var str = JSON.stringify(clientServerPairs);
       localStorage.setItem("clientServerPairs",str);
     }
@@ -76,7 +72,13 @@ angular.module('mapsApp', [])
     this.getPairs = function(){
       var str = localStorage.getItem("clientServerPairs");
       clientServerPairs = JSON.parse(str) || clientServerPairs;
+      console.log(clientServerPairs);
       return clientServerPairs;
+    }
+
+    this.viewPair = function(pIndex){
+      console.log('i was clicked!');
+      // TODO:  remove previous route added and only display clicked route
     }
 
 
@@ -237,45 +239,3 @@ var createRouteServerToServer = function (server1, server2, map, route) {
   };
   console.log('and the total distance is... ', routeDist); 
 };
-
-// APPEND TO CLIENT SERVER PAIRS
-/*function appendToClientServerPairs(clientServerPairs){
-  var clientAddress = document.getElementById('clientAddress').value;
-  var serverOptions = document.getElementById('serverNames');
-  var serverName = serverOptions.options[serverOptions.selectedIndex].value;
-
-  clientServerPairs.push({
-    serverName: serverName,
-    clientAddress: clientAddress
-  });
-
-  var btnId = 'btn' + (clientServerPairs.length - 1);
-
-  var newRow = "<tr><td>" + serverName + "</td><td>" + clientAddress + "</td>";
-  newRow += "<td><button class='btn btn-primary' id="+ btnId + ">View</button></td></tr>"
-
-  var div = document.getElementById('clientServerPairs');
-
-  div.innerHTML = div.innerHTML + newRow;
-
-  document.getElementById(btnId).addEventListener('click', function() {
-    clearAndReRoute(btnId, clientServerPairs);
-  });
-}
-
-function clearAndReRoute(btnId, clientServerPairs){
-  console.log("i was clicked!");
-  console.log('btnId: ', btnId);
-  console.log('clientServerPairs', clientServerPairs);
-
-
-
-}*/
-
-
-
-
-
-
-
-    
