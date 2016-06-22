@@ -1,1 +1,26 @@
+.btn {
+  border: none;
+  border-radius: 0px;
+}
 
+.btn-primary{
+  background-color: $navy;
+  color: $white;
+}
+
+.btn-primary:hover{
+  background-color: $blue;
+  color: $white;
+  border: none;
+}
+
+.btn-danger{
+  background-color: $dk-red;
+  color: $white;
+}
+
+.btn-danger:hover{
+  background-color: $red;
+  color: $white;
+  border: none;
+}

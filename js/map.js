@@ -200,7 +200,7 @@ var geocodeAddress = function (geocoder, map, route, clientAddress, finalServerN
 
       // Find closest server & set line
       closestServer = findClosestServer(clientLoc.lat, clientLoc.lng);
-      clientToServerLine = createNetworkLine(clientLoc, closestServer, '#022659', 3);
+      clientToServerLine = createNetworkLine(clientLoc, closestServer, '#0024F2', 3);
       currentClientToServerRoute.push(clientToServerLine);
       clientToServerLine.setMap(map);
 
@@ -258,7 +258,7 @@ var createRouteServerToServer = function (server1, server2, map, route, currentC
       for(var j=i+1; j<route.length; j++){
         pt2 = route[j];
         routeDist += distance(pt1.lat, pt1.lng, pt2.lat, pt2.lng);
-        serverToServerLine = createNetworkLine(pt1, pt2, "#022659", 3);
+        serverToServerLine = createNetworkLine(pt1, pt2, "#0024F2", 3);
         serverToServerLine.setMap(map);
         currentClientToServerRoute.push(serverToServerLine);
 
