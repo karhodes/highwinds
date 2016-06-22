@@ -1,4 +1,41 @@
+body {
+  background-color: #C4C4C4; }
+
+@font-face {
+  font-family: "Karla";
+  src: url("../assets/fonts/karla/Karla-Regular.ttf"); }
+
+h1 {
+  font-family: "Karla", Helvetica, sans-serif;
+  text-align: center; }
+
+#logo {
+  height: 50px;
+  width: 90px; }
+
+#mapContainer {
+  background-image: url("../assets/patterns/brushed_@2X.png"); }
+
 #map {
   height: 450px;
   display: block;
   width: 100%; }
+
+.navbar.navbar-default {
+  min-height: 80px;
+  line-height: 80px;
+  margin-bottom: 0px; }
+
+.navbar-default .navbar-nav > li > a {
+  font-family: "Karla", Helvetica, sans-serif;
+  font-size: 14.4px;
+  font-weight: bold;
+  color: #333333;
+  padding: 30px; }
+
+.navbar-default .navbar-nav > li > a:hover {
+  background-color: #FF1A1A;
+  color: #FFF; }
+
+.footer {
+  background-color: #0F0F1A; }
