@@ -238,11 +238,12 @@ var createNetworkLine = function (pts, color, strokeWeight) {
   });
 
   return networkLine;
-}
+};
 
-// PLACE DISTANCE ***************************************************** 
+// PLACE DISTANCE *****************************************************
 // Adds distance label to polyline at half way point
 var placeDistance = function (map, pt1, pt2) {
+  var inBetween = {};
   var latLng1 = new google.maps.LatLng(pt1.lat, pt1.lng);
   var latLng2 = new google.maps.LatLng(pt2.lat, pt2.lng);
 
