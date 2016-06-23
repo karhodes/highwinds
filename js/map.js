@@ -6,17 +6,18 @@
 angular.module('mapsApp', [])
   .controller('MapCtrl', function ($scope, $http, MapSvc) {
     var refresh = function () {
-      $scope.clientServerPairs = MapSvc.getPairs()
+      $scope.clientServerPairs = MapSvc.getPairs();
       $scope.pair = {};
     };
 
     // Map Variables:
+    var primaryNetworkline = {};
     var usaLat = 37.09024;
     var usaLong = -95.712891;
     var usaLatlng = new google.maps.LatLng(usaLat, usaLong);
     var mapOptions = {
-        zoom : 4,
-        center : usaLatlng
+      zoom: 4,
+      center: usaLatlng,
     };
 
     // these would preferably be set in a .env file
@@ -24,33 +25,42 @@ angular.module('mapsApp', [])
     var googleMapsAPI_KEY = 'AIzaSyAH9qcwj9QQxgs9xEZylRLUVHO8_aojLEY';
 
     // mapStyles creates the b&w appearance of map
-    var mapStyles = [{"featureType": "landscape", "stylers": [{"saturation": -100}, {"lightness": 65}, {"visibility": "on"}]}, {"featureType": "poi", "stylers": [{"saturation": -100}, {"lightness": 51}, {"visibility": "simplified"}]}, {"featureType": "road.highway", "stylers": [{"saturation": -100}, {"visibility": "simplified"}]}, {"featureType": "road.arterial", "stylers": [{"saturation": -100}, {"lightness": 30}, {"visibility": "on"}]}, {"featureType": "road.local", "stylers": [{"saturation": -100}, {"lightness": 40}, {"visibility": "on"}]}, {"featureType": "transit", "stylers": [{"saturation": -100}, {"visibility": "simplified"}]}, {"featureType": "administrative.province", "stylers": [{"visibility": "off"}]}, {"featureType": "water", "elementType": "labels", "stylers": [{"visibility": "on"}, {"lightness": -25}, {"saturation": -100}]}, {"featureType": "water", "elementType": "geometry", "stylers": [{"hue": "#c7d6dd"}, {"lightness": -25}, {"saturation": -97}]}];
+    var mapStyles = [
+      { featureType: 'landscape', stylers: [{ saturation: -100 }, { lightness: 65 }, { visibility: 'on' }] },
+      { featureType: 'poi', stylers: [{ saturation: -100 }, { lightness: 51 }, { visibility: 'simplified' }] },
+      { featureType: 'road.highway', stylers: [{ saturation: -100 }, { visibility: 'simplified' }] },
+      { featureType: 'road.arterial', stylers: [{ saturation: -100 }, { lightness: 30 }, { visibility: 'on' }] },
+      { featureType: 'road.local', stylers: [{ saturation: -100 }, { lightness: 40 }, { visibility: 'on' }] },
+      { featureType: 'transit', stylers: [{ saturation: -100 }, { visibility: 'simplified' }] },
+      { featureType: 'administrative.province', stylers: [{ visibility: 'off' }] },
+      { featureType: 'water', elementType: 'labels', stylers: [{ visibility: 'on' }, { lightness: -25 }, { saturation: -100 }] },
+      { featureType: 'water', elementType: 'geometry', stylers: [{ hue: '#c7d6dd' }, { lightness: -25 }, { saturation: -97 }] }];
 
     // Single outer CW route to pass through each point
     // Used for network lines
-    // TODO: create logic to generate network map dynamically 
+    // TODO: create logic to generate network map dynamically
     // based on nearest neighbors
-    // TODO:  create loops for outer CCW, inner CW & CCW 
+    // TODO:  create loops for outer CCW, inner CW & CCW
     // (can calc distance & compare to find shortest route)
     var route = [
-      getByName(serverLocs, "Atlanta"),
-      getByName(serverLocs, "Dallas"),
-      getByName(serverLocs, "Los Angeles"),
-      getByName(serverLocs, "Seattle"),
-      getByName(serverLocs, "Chicago"),
-      getByName(serverLocs, "New York"),
-      getByName(serverLocs, "Washington DC"),
-      getByName(serverLocs, "Atlanta"),
-      getByName(serverLocs, "Miami"),
-      getByName(serverLocs, "Dallas")
+      getByName(serverLocs, 'Atlanta'),
+      getByName(serverLocs, 'Dallas'),
+      getByName(serverLocs, 'Los Angeles'),
+      getByName(serverLocs, 'Seattle'),
+      getByName(serverLocs, 'Chicago'),
+      getByName(serverLocs, 'New York'),
+      getByName(serverLocs, 'Washington DC'),
+      getByName(serverLocs, 'Atlanta'),
+      getByName(serverLocs, 'Miami'),
+      getByName(serverLocs, 'Dallas'),
     ];
 
     // Load map
     $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
     $scope.map.set('styles', mapStyles);
-    
+
     // Place markers on map
-    for (var i=0; i<serverLocs.length; i++){
+    for (var i = 0; i < serverLocs.length; i++) {
       createMarker(serverLocs[i], $scope.map);
     }
 
@@ -59,8 +69,8 @@ angular.module('mapsApp', [])
     primaryNetworkline.setMap($scope.map);
 
     // Place distance markers on map
-    for (var i=0; i<(route.length-1); i++){
-      placeDistance($scope.map, route[i], route[(i + 1)]);
+    for (var j = 0; j < (route.length - 1); j++) {
+      placeDistance($scope.map, route[j], route[(j + 1)]);
     }
 
     // For map interactivity (accept client / server pairs & plot):
@@ -72,75 +82,73 @@ angular.module('mapsApp', [])
 
     // When a new client / server pair is submitted,
     // geocode client address, map it & call MapSvc to save to local storage
-    $scope.onSubmit = function() {
+    $scope.onSubmit = function () {
       var clientLoc = {};
-      var clientMarker = {};
       var closestServer = {};
       var clientToServerPath = [];
-      var serverToServer =[];
+      var serverToServer = [];
 
       $http({
         method: 'GET',
-        url: geocodeUrl + '?address=' + $scope.pair.client + '&key=' + googleMapsAPI_KEY
+        url: geocodeUrl + '?address=' + $scope.pair.client + '&key=' + googleMapsAPI_KEY,
       }).then(function successCallback(response) {
-          clientLoc = {
-            lat : response.data.results[0].geometry.location.lat,
-            lng : response.data.results[0].geometry.location.lng,
-            name : '', // TODO:  set these values!
-            address : '' // TODO:  set these values!
-          };
+        clientLoc = {
+          lat: response.data.results[0].geometry.location.lat,
+          lng: response.data.results[0].geometry.location.lng,
+          name: '', // TODO:  set these values!
+          address: '', // TODO:  set these values!
+        };
 
-          // clear any existing clientMarkers & clientToServerPaths
-          if($scope.clientMarker != null){
-            $scope.clientMarker.setMap(null);
-          }
+        // clear any existing clientMarkers & clientToServerPaths
+        if ($scope.clientMarker != null) {
+          $scope.clientMarker.setMap(null);
+        }
 
-          if($scope.clientToServerLine != null){
-            $scope.clientToServerLine.setMap(null);
-          }
+        if ($scope.clientToServerLine != null) {
+          $scope.clientToServerLine.setMap(null);
+        }
 
-          // add clientLoc info from $http call to $scope.pair
-          $scope.pair.clientLoc = {
-            lat: clientLoc.lat,
-            lng: clientLoc.lng
-          }
+        // add clientLoc info from $http call to $scope.pair
+        $scope.pair.clientLoc = {
+          lat: clientLoc.lat,
+          lng: clientLoc.lng,
+        };
 
-          $scope.clientMarker = createMarker(clientLoc, $scope.map);
+        $scope.clientMarker = createMarker(clientLoc, $scope.map);
 
-          // Find closest server & set line
-          clientToServerPath.push(clientLoc);
-          closestServer = findClosestServer(clientLoc.lat, clientLoc.lng); 
-          clientToServerPath.push(closestServer);           
+        // Find closest server & set line
+        clientToServerPath.push(clientLoc);
+        closestServer = findClosestServer(clientLoc.lat, clientLoc.lng);
+        clientToServerPath.push(closestServer);
 
-          if(closestServer.name != $scope.pair.server){
-            serverToServer = createRouteServerToServer(closestServer.name, $scope.pair.server, route);
-            clientToServerPath = clientToServerPath.concat(serverToServer);
-          };
+        if (closestServer.name != $scope.pair.server) {
+          serverToServer = createRouteServerToServer(closestServer.name, $scope.pair.server, route);
+          clientToServerPath = clientToServerPath.concat(serverToServer);
+        }
 
-          // Add clientToServerPath (array of pts) to $scope.pair
-          // Create & place line
-          $scope.pair.clientToServerPath = clientToServerPath; 
-          $scope.clientToServerLine = createNetworkLine(clientToServerPath, '#0024F2', 3);
-          $scope.clientToServerLine.setMap($scope.map);
+        // Add clientToServerPath (array of pts) to $scope.pair
+        // Create & place line
+        $scope.pair.clientToServerPath = clientToServerPath;
+        $scope.clientToServerLine = createNetworkLine(clientToServerPath, '#0024F2', 3);
+        $scope.clientToServerLine.setMap($scope.map);
 
-          // Save $scope.pair via MapSvc; refresh $scope
-          MapSvc.addPair($scope.pair);
-          refresh();
-
-        }, function errorCallback(response) {
-          return response.status(200).json(data);
-        }); 
+        // Save $scope.pair via MapSvc; refresh $scope
+        MapSvc.addPair($scope.pair);
+        refresh();
+      }, function errorCallback(response) {
+        return response.status(200).json(data);
+      });
     };
 
-    $scope.viewPair = function(idx){
+    $scope.viewPair = function (idx) {
       var currentPair = MapSvc.viewPair(idx);
 
       // Clear any existing markers & path
-      if($scope.clientMarker != null){
+      if ($scope.clientMarker != null) {
         $scope.clientMarker.setMap(null);
       }
 
-      if($scope.clientToServerLine != null){
+      if ($scope.clientToServerLine != null) {
         $scope.clientToServerLine.setMap(null);
       }
 
@@ -148,9 +156,9 @@ angular.module('mapsApp', [])
       $scope.clientMarker = createMarker(currentPair.clientLoc, $scope.map);
       $scope.clientToServerLine = createNetworkLine(currentPair.clientToServerPath, '#0024F2', 3);
       $scope.clientToServerLine.setMap($scope.map);
-    };  
+    };
 
-    $scope.deletePair = function(idx){
+    $scope.deletePair = function (idx) {
       MapSvc.deletePair(idx);
       refresh();
     };
