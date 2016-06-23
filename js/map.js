@@ -198,14 +198,14 @@ angular.module('mapsApp', [])
 var getByName = function (arr, value) {
   for (var i=0; i<arr.length; i++) {
     if (arr[i].name == value) return arr[i];
-  };
+  }
 };
 
 // CREATE MARKER ***************************************************
 var createMarker = function (info, map) {
   var infoWindow = new google.maps.InfoWindow();
   var marker = new google.maps.Marker({
-    position: {lat: info.lat, lng: info.lng},
+    position: { lat: info.lat, lng: info.lng },
     map: map,
     title: info.name,
   });
@@ -225,8 +225,8 @@ var createMarker = function (info, map) {
 var createNetworkLine = function (pts, color, strokeWeight) {
   var networkCoordinates = [];
 
-  for(var i=0; i<pts.length; i++){
-    networkCoordinates.push({lat: pts[i].lat, lng:pts[i].lng})
+  for (var i = 0; i < pts.length; i++) {
+    networkCoordinates.push({ lat: pts[i].lat, lng:pts[i].lng });
   }
 
   var networkLine = new google.maps.Polyline({
@@ -248,11 +248,11 @@ var placeDistance = function (map, pt1, pt2) {
   var latLng2 = new google.maps.LatLng(pt2.lat, pt2.lng);
 
   // get the point half-way between the two markers
-  inBetween = google.maps.geometry.spherical.interpolate(latLng1, latLng2, 0.5); 
+  inBetween = google.maps.geometry.spherical.interpolate(latLng1, latLng2, 0.5);
 
   // calculate distance between two points
   var dist = distance(pt1.lat, pt1.lng, pt2.lat, pt2.lng);
-  
+
   // place mapLabel on map
   var mapLabel = new MapLabel({
     text: dist + ' mi',
