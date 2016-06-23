@@ -42,12 +42,11 @@
       <h1>We own and operate our own network</h1>
       <div id='map'></div>
 
-      
       <!-- Form to accept client / server pairs -->
       <div class='col-md-4' id='form-container'>
         <div >
           <h2>See how we connect</h2>
-          <form ng-submit="$emit('onSubmit')">
+          <form ng-submit='onSubmit()'>
             <div class='form-group'>
               <label for="clientAddress">Client Location<span class='required-label'>*</span></label>
               <input required ng-model='pair.client' id='clientAddress' class="form-control" type='textbox' placeholder='Enter an address'>

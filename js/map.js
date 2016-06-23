@@ -5,6 +5,11 @@
 // Creates dynamic drop-down menu based on service locations
 angular.module('mapsApp', [])
   .controller('MapCtrl', function ($scope, $http, MapSvc) {
+    var refresh = function () {
+      $scope.clientServerPairs = MapSvc.getPairs()
+      $scope.pair = {};
+    };
+
     // Map Variables:
     var usaLat = 37.09024;
     var usaLong = -95.712891;
@@ -67,7 +72,7 @@ angular.module('mapsApp', [])
 
     // When a new client / server pair is submitted,
     // geocode client address, map it & call MapSvc to save to local storage
-    $scope.$on('onSubmit', function() {
+    $scope.onSubmit = function() {
       var clientLoc = {};
       var clientMarker = {};
       var closestServer = {};
@@ -112,26 +117,25 @@ angular.module('mapsApp', [])
             clientToServerPath = clientToServerPath.concat(serverToServer);
           };
 
-          // add clientToServerPath (array of pts) to $scope.pair
-          // create & place line
+          // Add clientToServerPath (array of pts) to $scope.pair
+          // Create & place line
           $scope.pair.clientToServerPath = clientToServerPath; 
           $scope.clientToServerLine = createNetworkLine(clientToServerPath, '#0024F2', 3);
           $scope.clientToServerLine.setMap($scope.map);
 
-          // save $scope.pair via MapSvc; clear $scope.pair
+          // Save $scope.pair via MapSvc; refresh $scope
           MapSvc.addPair($scope.pair);
-          $scope.pair = {}; 
+          refresh();
 
         }, function errorCallback(response) {
-
-          console.log('boo!');
+          return response.status(200).json(data);
         }); 
-    });
+    };
 
     $scope.viewPair = function(idx){
       var currentPair = MapSvc.viewPair(idx);
-      console.log('currentPair: ', currentPair);
 
+      // Clear any existing markers & path
       if($scope.clientMarker != null){
         $scope.clientMarker.setMap(null);
       }
@@ -140,6 +144,7 @@ angular.module('mapsApp', [])
         $scope.clientToServerLine.setMap(null);
       }
 
+      // Set marker & path for currentPair
       $scope.clientMarker = createMarker(currentPair.clientLoc, $scope.map);
       $scope.clientToServerLine = createNetworkLine(currentPair.clientToServerPath, '#0024F2', 3);
       $scope.clientToServerLine.setMap($scope.map);
@@ -147,6 +152,7 @@ angular.module('mapsApp', [])
 
     $scope.deletePair = function(idx){
       MapSvc.deletePair(idx);
+      refresh();
     };     
   })
   .service("MapSvc", function(){
@@ -182,12 +188,6 @@ angular.module('mapsApp', [])
       clientServerPairs.splice(pIndex,1);
       var str = JSON.stringify(clientServerPairs);
       localStorage.setItem("clientServerPairs",str);
-
-      clientMarkers.splice(pIndex,1);
-      localStorage.setItem("clientMarkers", clientMarkers);
-
-      clientToServerLines.splice(pIndex, 1);
-      localStorage.setItem('clientToServerLines', clientToServerLines);
     }
 
   });  
