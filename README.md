@@ -37,3 +37,13 @@ Display the distance between the two pop's in the map UI.
  * The UI should accept two street addresses as a pair. One labeled "client" and the other labeled "server". The "server" address can only be one of the street addresses of the network POP's. Drop a pin onto the map for the client address, draw a line entering the network using the closest POP to the "client", and then draw a line through the network to get to the POP with the destination server. 
  * All inputted address pairs should be retained and displayed somewhere in the UI. You should be able to select the pair and have the map redraw the route.
  * Bonus points (not required): Get the client to the server with as little physical distance as possible, and display on the screen proof that it was the shortest distance.
+
+## Colophon:
+ * Javascript
+ * HTML & CSS
+ * AngularJS
+ * Bootstrap
+ * jQuery
+ * Gulp
+ * Bootstrap & SASS
+ * Google Maps API 

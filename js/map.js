@@ -298,16 +298,16 @@ var createRouteServerToServer = function (server1, server2, route) {
   var pt2 = {};
   var pts = [];
 
-  for(var i=0; i<route.length; i++){
-    if (server1 == route[i].name) {
+  for (var i = 0; i < route.length; i++) {
+    if (server1 === route[i].name) {
       pt1 = route[i];
-      
-      for(var j=i+1; j<route.length; j++){
+
+      for (var j = i + 1; j < route.length; j++) {
         pt2 = route[j];
         routeDist += distance(pt1.lat, pt1.lng, pt2.lat, pt2.lng);
         pts.push(pt1);
 
-        if(server2 == route[j].name){
+        if (server2 === route[j].name) {
           server2Match = true;
           break;
         } else {
@@ -315,12 +315,10 @@ var createRouteServerToServer = function (server1, server2, route) {
         }
 
         // start loop over if a server2Match has not been found and on last item
-        if(!server2Match && j == (route.length - 1)){
-          j = 0;
-        };
-      };
-    };
-  };
+        if (!server2Match && j === (route.length - 1)) j = 0;
+      }
+    }
+  }
 
   pts.push(pt2);
 
