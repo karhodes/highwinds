@@ -4,7 +4,12 @@
 // Adds new marker based on user input
 // Creates dynamic drop-down menu based on service locations
 angular.module('mapsApp', [])
-  .controller('MapCtrl', function ($scope, MapSvc) {
+  .controller('MapCtrl', function ($scope, $http, MapSvc) {
+    var refresh = function () {
+      $scope.clientServerPairs = MapSvc.getPairs()
+      $scope.pair = {};
+    };
+
     // Map Variables:
     var usaLat = 37.09024;
     var usaLong = -95.712891;
@@ -14,13 +19,19 @@ angular.module('mapsApp', [])
         center : usaLatlng
     };
 
+    // these would preferably be set in a .env file
+    var geocodeUrl = 'https://maps.googleapis.com/maps/api/geocode/json';
+    var googleMapsAPI_KEY = 'AIzaSyAH9qcwj9QQxgs9xEZylRLUVHO8_aojLEY';
+
+    // mapStyles creates the b&w appearance of map
     var mapStyles = [{"featureType": "landscape", "stylers": [{"saturation": -100}, {"lightness": 65}, {"visibility": "on"}]}, {"featureType": "poi", "stylers": [{"saturation": -100}, {"lightness": 51}, {"visibility": "simplified"}]}, {"featureType": "road.highway", "stylers": [{"saturation": -100}, {"visibility": "simplified"}]}, {"featureType": "road.arterial", "stylers": [{"saturation": -100}, {"lightness": 30}, {"visibility": "on"}]}, {"featureType": "road.local", "stylers": [{"saturation": -100}, {"lightness": 40}, {"visibility": "on"}]}, {"featureType": "transit", "stylers": [{"saturation": -100}, {"visibility": "simplified"}]}, {"featureType": "administrative.province", "stylers": [{"visibility": "off"}]}, {"featureType": "water", "elementType": "labels", "stylers": [{"visibility": "on"}, {"lightness": -25}, {"saturation": -100}]}, {"featureType": "water", "elementType": "geometry", "stylers": [{"hue": "#c7d6dd"}, {"lightness": -25}, {"saturation": -97}]}];
 
     // Single outer CW route to pass through each point
     // Used for network lines
     // TODO: create logic to generate network map dynamically 
     // based on nearest neighbors
-    // TODO:  create loops for outer CCW, inner CW & CCW (can calc distance & compare)
+    // TODO:  create loops for outer CCW, inner CW & CCW 
+    // (can calc distance & compare to find shortest route)
     var route = [
       getByName(serverLocs, "Atlanta"),
       getByName(serverLocs, "Dallas"),
@@ -34,10 +45,9 @@ angular.module('mapsApp', [])
       getByName(serverLocs, "Dallas")
     ];
 
-    // Load map & geocoder
+    // Load map
     $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
     $scope.map.set('styles', mapStyles);
-    $scope.geocoder = new google.maps.Geocoder();
     
     // Place markers on map
     for (var i=0; i<serverLocs.length; i++){
@@ -45,9 +55,11 @@ angular.module('mapsApp', [])
     }
 
     // Place intial network lines on map
+    primaryNetworkline = createNetworkLine(route, '#FF1A1A', 2);
+    primaryNetworkline.setMap($scope.map);
+
+    // Place distance markers on map
     for (var i=0; i<(route.length-1); i++){
-      networkline = createNetworkLine(route[i], route[(i + 1)], '#FF1A1A', 2);
-      networkline.setMap($scope.map);
       placeDistance($scope.map, route[i], route[(i + 1)]);
     }
 
@@ -55,27 +67,107 @@ angular.module('mapsApp', [])
     $scope.pair = {};
     $scope.serverLocs = serverLocs;
     $scope.clientServerPairs = MapSvc.getPairs();
+    $scope.clientMarkers = [];
+    $scope.clientToServerLines = [];
 
-    $scope.$on('onSubmit', function() {
-      geocodeAddress($scope.geocoder, $scope.map, route, $scope.pair.client, $scope.pair.server);
-      MapSvc.addPair($scope.pair);
-      $scope.pair = {};
-    });
+    // When a new client / server pair is submitted,
+    // geocode client address, map it & call MapSvc to save to local storage
+    $scope.onSubmit = function() {
+      var clientLoc = {};
+      var clientMarker = {};
+      var closestServer = {};
+      var clientToServerPath = [];
+      var serverToServer =[];
+
+      $http({
+        method: 'GET',
+        url: geocodeUrl + '?address=' + $scope.pair.client + '&key=' + googleMapsAPI_KEY
+      }).then(function successCallback(response) {
+          clientLoc = {
+            lat : response.data.results[0].geometry.location.lat,
+            lng : response.data.results[0].geometry.location.lng,
+            name : '', // TODO:  set these values!
+            address : '' // TODO:  set these values!
+          };
+
+          // clear any existing clientMarkers & clientToServerPaths
+          if($scope.clientMarker != null){
+            $scope.clientMarker.setMap(null);
+          }
+
+          if($scope.clientToServerLine != null){
+            $scope.clientToServerLine.setMap(null);
+          }
+
+          // add clientLoc info from $http call to $scope.pair
+          $scope.pair.clientLoc = {
+            lat: clientLoc.lat,
+            lng: clientLoc.lng
+          }
+
+          $scope.clientMarker = createMarker(clientLoc, $scope.map);
+
+          // Find closest server & set line
+          clientToServerPath.push(clientLoc);
+          closestServer = findClosestServer(clientLoc.lat, clientLoc.lng); 
+          clientToServerPath.push(closestServer);           
+
+          if(closestServer.name != $scope.pair.server){
+            serverToServer = createRouteServerToServer(closestServer.name, $scope.pair.server, route);
+            clientToServerPath = clientToServerPath.concat(serverToServer);
+          };
+
+          // Add clientToServerPath (array of pts) to $scope.pair
+          // Create & place line
+          $scope.pair.clientToServerPath = clientToServerPath; 
+          $scope.clientToServerLine = createNetworkLine(clientToServerPath, '#0024F2', 3);
+          $scope.clientToServerLine.setMap($scope.map);
+
+          // Save $scope.pair via MapSvc; refresh $scope
+          MapSvc.addPair($scope.pair);
+          refresh();
+
+        }, function errorCallback(response) {
+          return response.status(200).json(data);
+        }); 
+    };
 
     $scope.viewPair = function(idx){
-      currentPair = MapSvc.viewPair(idx);
-      geocodeAddress($scope.geocoder, $scope.map, route, currentPair.client, currentPair.server);
+      var currentPair = MapSvc.viewPair(idx);
+
+      // Clear any existing markers & path
+      if($scope.clientMarker != null){
+        $scope.clientMarker.setMap(null);
+      }
+
+      if($scope.clientToServerLine != null){
+        $scope.clientToServerLine.setMap(null);
+      }
+
+      // Set marker & path for currentPair
+      $scope.clientMarker = createMarker(currentPair.clientLoc, $scope.map);
+      $scope.clientToServerLine = createNetworkLine(currentPair.clientToServerPath, '#0024F2', 3);
+      $scope.clientToServerLine.setMap($scope.map);
     };  
 
     $scope.deletePair = function(idx){
       MapSvc.deletePair(idx);
+      refresh();
     };     
   })
   .service("MapSvc", function(){
     var clientServerPairs = [];
+    var clientMarkers = [];
+    var clientToServerLines = [];
 
     this.addPair = function (pair) {
-      clientServerPairs.push({'client': pair.client, 'server': pair.server});
+      clientServerPairs.push({
+        'client': pair.client, 
+        'server': pair.server, 
+        'clientLoc': pair.clientLoc, 
+        'clientToServerPath': pair.clientToServerPath
+      });
+
       var str = JSON.stringify(clientServerPairs);
       localStorage.setItem("clientServerPairs",str);
     }
@@ -125,23 +217,19 @@ var createMarker = function (info, map) {
     infoWindow.open(map, marker);
   });
 
-  // return marker;
+  return marker;
 };
 
 // CREATE NETWORK LINE ***********************************************
-// Create "network" connections between two points
-// Calculate the distance between two points
-// Add distance value to map if distOn is true
-var createNetworkLine = function (pt1, pt2, color, strokeWeight) {
-  var latLng1 = new google.maps.LatLng(pt1.lat, pt1.lng);
-  var latLng2 = new google.maps.LatLng(pt2.lat, pt2.lng);
+// Create "network" connections between array of points
+var createNetworkLine = function (pts, color, strokeWeight) {
+  var networkCoordinates = [];
 
-  var networkCoordinates = [
-    {lat: pt1.lat, lng: pt1.lng},
-    {lat: pt2.lat, lng: pt2.lng},
-  ];
+  for(var i=0; i<pts.length; i++){
+    networkCoordinates.push({lat: pts[i].lat, lng:pts[i].lng})
+  }
 
-  var networkPath = new google.maps.Polyline({
+  var networkLine = new google.maps.Polyline({
     path: networkCoordinates,
     geodesic: true,
     strokeColor: color,
@@ -149,7 +237,7 @@ var createNetworkLine = function (pt1, pt2, color, strokeWeight) {
     strokeWeight: strokeWeight,
   });
 
-  return networkPath;
+  return networkLine;
 }
 
 // PLACE DISTANCE ***************************************************** 
@@ -174,39 +262,6 @@ var placeDistance = function (map, pt1, pt2) {
 
   mapLabel.set('position', inBetween);
 }
-
-// GEOCODE ADDRESS ***************************************************** 
-// Translate client address string to lat / lng & place marker)
-// Call findClosestServer() & createNetworkLine to that server
-var geocodeAddress = function (geocoder, map, route, clientAddress, finalServerName) {
-  geocoder.geocode({'address': clientAddress}, function(results, status) {
-    if (status === google.maps.GeocoderStatus.OK) {
-      clientLoc = {
-        lat : results[0].geometry.location.lat(),
-        lng : results[0].geometry.location.lng(),
-        address : clientAddress
-      };
-
-      createMarker(clientLoc, map);
-
-      // Find closest server & set line
-      closestServer = findClosestServer(clientLoc.lat, clientLoc.lng);
-      clientToServerLine = createNetworkLine(clientLoc, closestServer, '#0024F2', 3);
-      //currentClientToServerRoute.push(clientToServerLine);
-      clientToServerLine.setMap(map);
-
-      if(closestServer.name != finalServerName){
-        createRouteServerToServer(closestServer.name, finalServerName, map, route);
-        //currentClientToServerRoute = createRouteServerToServer(closestServer.name, finalServerName, map, route, currentClientToServerRoute);
-      };
-
-      // return currentClientToServerRoute;
-
-    } else {
-      alert('Geocode was not successful for the following reason: ' + status);
-    };
-  });
-};
 
 // FIND CLOSEST SERVER ***********************************************
 var findClosestServer = function (clientLat, clientLng) {
@@ -235,23 +290,22 @@ var findClosestServer = function (clientLat, clientLng) {
 // CREATE ROUTE FOR SERVER TO SERVER ***********************************************
 // TODO:  implement logic for shortest route
 // calculates the distance between server1 & server2
-// plots "network" connections between server1 & server2
-var createRouteServerToServer = function (server1, server2, map, route) {
+// return array of pts from server1 to server 2
+var createRouteServerToServer = function (server1, server2, route) {
   var server2Match = false;
   var routeDist = 0;
   var pt1 = {};
   var pt2 = {};
+  var pts = [];
 
   for(var i=0; i<route.length; i++){
     if (server1 == route[i].name) {
       pt1 = route[i];
-
+      
       for(var j=i+1; j<route.length; j++){
         pt2 = route[j];
         routeDist += distance(pt1.lat, pt1.lng, pt2.lat, pt2.lng);
-        serverToServerLine = createNetworkLine(pt1, pt2, "#0024F2", 3);
-        serverToServerLine.setMap(map);
-        // currentClientToServerRoute.push(serverToServerLine);
+        pts.push(pt1);
 
         if(server2 == route[j].name){
           server2Match = true;
@@ -267,6 +321,9 @@ var createRouteServerToServer = function (server1, server2, map, route) {
       };
     };
   };
+
+  pts.push(pt2);
+
   console.log('and the total distance is... ', routeDist);
-  // return currentClientToServerRoute; 
+  return pts;
 };
