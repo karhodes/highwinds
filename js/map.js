@@ -261,7 +261,7 @@ var placeDistance = function (map, pt1, pt2) {
   });
 
   mapLabel.set('position', inBetween);
-}
+};
 
 // FIND CLOSEST SERVER ***********************************************
 var findClosestServer = function (clientLat, clientLng) {
@@ -281,9 +281,9 @@ var findClosestServer = function (clientLat, clientLng) {
       if (calcDist[i] < closestDist) {
         closestDist = calcDist[i];
         closestServer = serverLocs[i];
-      };
-    };
-  }; 
+      }
+    }
+  }
   return closestServer;
 };
 
