@@ -153,52 +153,49 @@ angular.module('mapsApp', [])
     $scope.deletePair = function(idx){
       MapSvc.deletePair(idx);
       refresh();
-    };     
+    };
   })
-  .service("MapSvc", function(){
+  .service('MapSvc', function () {
     var clientServerPairs = [];
-    var clientMarkers = [];
-    var clientToServerLines = [];
 
     this.addPair = function (pair) {
       clientServerPairs.push({
-        'client': pair.client, 
-        'server': pair.server, 
-        'clientLoc': pair.clientLoc, 
-        'clientToServerPath': pair.clientToServerPath
+        client: pair.client,
+        server: pair.server,
+        clientLoc: pair.clientLoc,
+        clientToServerPath: pair.clientToServerPath,
       });
 
       var str = JSON.stringify(clientServerPairs);
-      localStorage.setItem("clientServerPairs",str);
-    }
+      localStorage.setItem('clientServerPairs', str);
+    };
 
-    this.getPairs = function(){
-      var str = localStorage.getItem("clientServerPairs");
+    this.getPairs = function () {
+      var str = localStorage.getItem('clientServerPairs');
       clientServerPairs = JSON.parse(str) || clientServerPairs;
       return clientServerPairs;
-    }
+    };
 
-    this.viewPair = function(pIndex){
-      var str = localStorage.getItem("clientServerPairs", str);
+    this.viewPair = function (pIndex) {
+      var str = localStorage.getItem('clientServerPairs', str);
       clientServerPairs = JSON.parse(str);
       return clientServerPairs[pIndex];
-    }
+    };
 
-    this.deletePair = function(pIndex){
-      clientServerPairs.splice(pIndex,1);
+    this.deletePair = function (pIndex) {
+      clientServerPairs.splice(pIndex, 1);
       var str = JSON.stringify(clientServerPairs);
-      localStorage.setItem("clientServerPairs",str);
-    }
-
-  });  
+      localStorage.setItem('clientServerPairs', str);
+    };
+  });
 
 // ****************************************************************
 // GET BY NAME ****************************************************
 // Loop over array of objects to find with matching name (i.e. Atlanta, Miami...)
 var getByName = function (arr, value) {
-  for (var i=0; i<arr.length; i++) {
-    if (arr[i].name == value) return arr[i];
-  }
+  for (var i = 0; i < arr.length; i++) {
+    if (arr[i].name === value) return arr[i];
+  } //TODO:  create case for else?
 };
 
 // CREATE MARKER ***************************************************
