@@ -46,7 +46,7 @@ angular.module('mapsApp', [])
 
     // Place intial network lines on map
     for (var i=0; i<(route.length-1); i++){
-      networkline = createNetworkLine(route[i], route[(i + 1)], '#FF1A1A', 2);
+      networkline = createNetworkLine([route[i], route[(i + 1)]], '#FF1A1A', 2);
       networkline.setMap($scope.map);
       placeDistance($scope.map, route[i], route[(i + 1)]);
     }
@@ -64,6 +64,7 @@ angular.module('mapsApp', [])
 
     $scope.viewPair = function(idx){
       currentPair = MapSvc.viewPair(idx);
+      //$scope.map.clear();
       geocodeAddress($scope.geocoder, $scope.map, route, currentPair.client, currentPair.server);
     };  
 
@@ -130,11 +131,11 @@ var createMarker = function (info, map) {
 
 // CREATE NETWORK LINE ***********************************************
 // Create "network" connections between two points
-// Calculate the distance between two points
+// Calculate the distance between an array of points
 // Add distance value to map if distOn is true
-var createNetworkLine = function (pt1, pt2, color, strokeWeight) {
-  var latLng1 = new google.maps.LatLng(pt1.lat, pt1.lng);
-  var latLng2 = new google.maps.LatLng(pt2.lat, pt2.lng);
+var createNetworkLine = function (pts, color, strokeWeight) {
+  var pt1 = pts[0];
+  var pt2 = pts[1];
 
   var networkCoordinates = [
     {lat: pt1.lat, lng: pt1.lng},
@@ -191,16 +192,12 @@ var geocodeAddress = function (geocoder, map, route, clientAddress, finalServerN
 
       // Find closest server & set line
       closestServer = findClosestServer(clientLoc.lat, clientLoc.lng);
-      clientToServerLine = createNetworkLine(clientLoc, closestServer, '#0024F2', 3);
-      //currentClientToServerRoute.push(clientToServerLine);
+      clientToServerLine = createNetworkLine([clientLoc, closestServer], '#0024F2', 3);
       clientToServerLine.setMap(map);
 
       if(closestServer.name != finalServerName){
         createRouteServerToServer(closestServer.name, finalServerName, map, route);
-        //currentClientToServerRoute = createRouteServerToServer(closestServer.name, finalServerName, map, route, currentClientToServerRoute);
       };
-
-      // return currentClientToServerRoute;
 
     } else {
       alert('Geocode was not successful for the following reason: ' + status);
@@ -249,9 +246,8 @@ var createRouteServerToServer = function (server1, server2, map, route) {
       for(var j=i+1; j<route.length; j++){
         pt2 = route[j];
         routeDist += distance(pt1.lat, pt1.lng, pt2.lat, pt2.lng);
-        serverToServerLine = createNetworkLine(pt1, pt2, "#0024F2", 3);
+        serverToServerLine = createNetworkLine([pt1, pt2], "#0024F2", 3);
         serverToServerLine.setMap(map);
-        // currentClientToServerRoute.push(serverToServerLine);
 
         if(server2 == route[j].name){
           server2Match = true;
@@ -268,5 +264,4 @@ var createRouteServerToServer = function (server1, server2, map, route) {
     };
   };
   console.log('and the total distance is... ', routeDist);
-  // return currentClientToServerRoute; 
 };
