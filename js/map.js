@@ -36,13 +36,10 @@ angular.module('mapsApp', [])
       { featureType: 'water', elementType: 'labels', stylers: [{ visibility: 'on' }, { lightness: -25 }, { saturation: -100 }] },
       { featureType: 'water', elementType: 'geometry', stylers: [{ hue: '#c7d6dd' }, { lightness: -25 }, { saturation: -97 }] }];
 
-    // Single outer CW route to pass through each point
-    // Used for network lines
+    // Routes for network lines
     // TODO: create logic to generate network map dynamically
     // based on nearest neighbors
-    // TODO:  create loops for outer CCW, inner CW & CCW
-    // (can calc distance & compare to find shortest route)
-    var route = [
+    var outerCwRoute = [
       getByName(serverLocs, 'Atlanta'),
       getByName(serverLocs, 'Dallas'),
       getByName(serverLocs, 'Los Angeles'),
@@ -55,6 +52,14 @@ angular.module('mapsApp', [])
       getByName(serverLocs, 'Dallas'),
     ];
 
+    var outerCcwRoute = outerCwRoute.slice();
+    outerCcwRoute.reverse();
+    var innerCwRoute = outerCwRoute.slice(0,8); // remove Miami, Dallas
+    var innerCcwRoute = innerCwRoute.slice();
+    innerCcwRoute.reverse();
+
+    var routes = [outerCwRoute, outerCcwRoute, innerCwRoute, innerCcwRoute];
+
     // Load map
     $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
     $scope.map.set('styles', mapStyles);
@@ -65,12 +70,12 @@ angular.module('mapsApp', [])
     }
 
     // Place intial network lines on map
-    primaryNetworkline = createNetworkLine(route, '#FF1A1A', 2);
+    primaryNetworkline = createNetworkLine(outerCwRoute, '#FF1A1A', 2);
     primaryNetworkline.setMap($scope.map);
 
     // Place distance markers on map
-    for (var j = 0; j < (route.length - 1); j++) {
-      placeDistance($scope.map, route[j], route[(j + 1)]);
+    for (var j = 0; j < (outerCwRoute.length - 1); j++) {
+      placeDistance($scope.map, outerCwRoute[j], outerCwRoute[(j + 1)]);
     }
 
     // For map interactivity (accept client / server pairs & plot):
@@ -86,7 +91,10 @@ angular.module('mapsApp', [])
       var clientLoc = {};
       var closestServer = {};
       var clientToServerPath = [];
-      var serverToServer = [];
+      var closestServerData = {};
+      var serverToServerPts = [];
+      var serverToServerData = {};
+      var routeDist = 0;
 
       $http({
         method: 'GET',
@@ -118,14 +126,19 @@ angular.module('mapsApp', [])
 
         // Find closest server & set line
         clientToServerPath.push(clientLoc);
-        closestServer = findClosestServer(clientLoc.lat, clientLoc.lng);
+        closestServerData = findClosestServer(clientLoc.lat, clientLoc.lng);
+        closestServer = closestServerData.closestServer;
+        routeDist += closestServerData.dist;
         clientToServerPath.push(closestServer);
 
         if (closestServer.name != $scope.pair.server) {
-          serverToServer = createRouteServerToServer(closestServer.name, $scope.pair.server, route).pts;
-          // get dist as well
-          clientToServerPath = clientToServerPath.concat(serverToServer);
+          serverToServerData = createRouteServerToServer(closestServer.name, $scope.pair.server, routes);
+          serverToServerPts = serverToServerData.pts;
+          routeDist += serverToServerData.dist;
+          clientToServerPath = clientToServerPath.concat(serverToServerPts);
         }
+
+        $scope.pair.dist = routeDist;
 
         // Add clientToServerPath (array of pts) to $scope.pair
         // Create & place line
@@ -173,6 +186,7 @@ angular.module('mapsApp', [])
         server: pair.server,
         clientLoc: pair.clientLoc,
         clientToServerPath: pair.clientToServerPath,
+        dist: pair.dist,
       });
 
       var str = JSON.stringify(clientServerPairs);
@@ -276,6 +290,7 @@ var findClosestServer = function (clientLat, clientLng) {
   var calcDist = [];
   var closestDist = 0;
   var closestServer = {};
+  var data = {};
 
   // get all distances
   for (var i = 0; i < serverLocs.length; i++) {
@@ -291,53 +306,97 @@ var findClosestServer = function (clientLat, clientLng) {
       }
     }
   }
-  return closestServer;
+
+  data = {
+    dist: closestDist,
+    closestServer: closestServer,
+  };
+
+  return data;
 };
 
 // CREATE ROUTE FOR SERVER TO SERVER ***********************************************
 // TODO:  implement logic for shortest route
 // calculates the distance between server1 & server2
 // return array of pts from server1 to server 2
-var createRouteServerToServer = function (server1, server2, route) {
+var createRouteServerToServer = function (server1, server2, routes) {
   var server2Match = false;
   var routeDist = 0;
   var pt1 = {};
   var pt2 = {};
   var pts = [];
   var data = {};
+  var routeCalcs = [];
+  var route = [];
+  var minDist = 0;
+  var minIndex = 0;
+  var popRoutes = routes.slice();
 
-  for (var i = 0; i < route.length; i++) {
-    if (server1 === route[i].name) {
-      pt1 = route[i];
+  // case if start or end server is Miami 
+  // (basically routes[2] & route[3] will loop indefinetly)
+  if (server1 == 'Miami' || server2 == 'Miami') popRoutes.splice(2,2);
 
-      for (var j = i + 1; j < route.length; j++) {
-        pt2 = route[j];
-        routeDist += distance(pt1.lat, pt1.lng, pt2.lat, pt2.lng);
-        pts.push(pt1);
+  // Loop over all potential routes
+  for (var k = 0; k < popRoutes.length; k++) {
+    route = popRoutes[k];
 
-        if (server2 === route[j].name) {
-          server2Match = true;
-          break;
-        } else {
-          pt1 = pt2;
+    // Loop over all pops in route
+    for (var i = 0; i < route.length; i++) {  
+      
+      // Find the index in route where server1 is a match
+      // Set pt1 equal to that item
+      if (server1 === route[i].name) {
+        pt1 = route[i];
+
+        // Continue looping  over route starting at the next item
+        // Add the distance to the total distance
+        // push the point into the points array
+        for (var j = i + 1; j < route.length; j++) {
+          pt2 = route[j];
+          routeDist += distance(pt1.lat, pt1.lng, pt2.lat, pt2.lng);
+          pts.push(pt1);
+
+          // Look for a match on the server2 name
+          // Break out of the loop if a match
+          // otherwise, reset pt1 to pt2 to continue the loop
+          if (server2 === route[j].name) {
+            server2Match = true;
+            break;
+          } else {
+            pt1 = pt2;
+          }
+
+          // start loop over if a server2Match has not been found and on last item
+          if (!server2Match && j === (route.length - 1)) j = 0;
         }
-
-        // start loop over if a server2Match has not been found and on last item
-        if (!server2Match && j === (route.length - 1)) j = 0;
       }
     }
+
+    pts.push(pt2);
+
+    data = {
+      pts: pts.slice(),
+      dist: routeDist,
+    };
+
+    routeCalcs.push(data);
+
+    // reset server2Match, routeDist & pts
+    routeDist = 0;
+    pts = [];
+    pt1 = {};
+    pt2 = {};
+    server2Match = false;
   }
 
-  pts.push(pt2);
+  minDist = routeCalcs[0].dist;
 
-  console.log('and the total distance is... ', routeDist);
-  // return pts;
+  for (var x = 0; x < routeCalcs.length; x++) {
+    if (routeCalcs[x].dist < minDist) {
+      minDist = routeCalcs[x].dist;
+      minIndex = x;
+    }  
+  }
 
-  data = {
-    pts: pts,
-    dist: routeDist,
-  };
-
-  return data;
-
+  return routeCalcs[minIndex];
 };

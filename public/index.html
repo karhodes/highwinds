@@ -70,12 +70,14 @@
           <tr>
             <th>Client Location</th>
             <th>Server Location</th>
+            <th>Distance (mi)</th>
             <th></th>
             <th></th>
           <tr>
           <tr ng-repeat='pair in clientServerPairs track by $index'>
             <td>{{ pair.client }}</td>
             <td>{{ pair.server }}</td>
+            <td>{{ pair.dist }}</td>
             <td><button class="btn btn-primary" ng-click='viewPair($index)'>View</button></td>
             <td><button class="btn btn-danger" ng-click='deletePair($index)'><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button></td>
           </tr>  
