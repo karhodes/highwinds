@@ -103,9 +103,11 @@ angular.module('mapsApp', [])
         clientLoc = {
           lat: response.data.results[0].geometry.location.lat,
           lng: response.data.results[0].geometry.location.lng,
-          name: '', // TODO:  set these values!
-          address: '', // TODO:  set these values!
+          name: 'Client Location', 
+          address: response.data.results[0].formatted_address,
         };
+
+        $scope.pair.client = response.data.results[0].formatted_address;
 
         // clear any existing clientMarkers & clientToServerPaths
         if ($scope.clientMarker != null) {
@@ -120,6 +122,8 @@ angular.module('mapsApp', [])
         $scope.pair.clientLoc = {
           lat: clientLoc.lat,
           lng: clientLoc.lng,
+          name: 'Client Location', 
+          address: response.data.results[0].formatted_address,
         };
 
         $scope.clientMarker = createMarker(clientLoc, $scope.map);
@@ -173,9 +177,24 @@ angular.module('mapsApp', [])
     };
 
     $scope.deletePair = function (idx) {
+      var currentPair = MapSvc.viewPair(idx);
+
       MapSvc.deletePair(idx);
       refresh();
     };
+
+    $scope.clearMap = function(){
+      // Clear any existing markers & path
+      if ($scope.clientMarker != null) {
+        $scope.clientMarker.setMap(null);
+      }
+
+      if ($scope.clientToServerLine != null) {
+        $scope.clientToServerLine.setMap(null);
+      }
+
+    };
+
   })
   .service('MapSvc', function () {
     var clientServerPairs = [];
@@ -224,10 +243,15 @@ var getByName = function (arr, value) {
 // CREATE MARKER ***************************************************
 var createMarker = function (info, map) {
   var infoWindow = new google.maps.InfoWindow();
+  var icon = '';
+
+  info.name === 'Client Location' ? icon = 'assets/img/location-pin-blue.png' : icon = 'assets/img/location-pin-red.png';
+
   var marker = new google.maps.Marker({
     position: { lat: info.lat, lng: info.lng },
     map: map,
     title: info.name,
+    icon: icon,
   });
 
   marker.content = '<div class="infoWindowContent">' + info.address + '</div>';
@@ -279,6 +303,7 @@ var placeDistance = function (map, pt1, pt2) {
     position: inBetween,
     map: map,
     fontSize: 20,
+    zIndex: 100,
   });
 
   mapLabel.set('position', inBetween);

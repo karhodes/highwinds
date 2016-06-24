@@ -1,24 +1,8 @@
 @import "modules/all";
 
-// Font weights
-$light: 100;
-$regular: 400;
-$bold: 600;
-
 // Base Font
 $base-font-family: "Karla", Helvetica, sans-serif;
 $base-font-family-bold: "Karla-Bold", Helvetica, sans-serif;
-//$base-font-weight: $regular;
-//$base-font-size: 13px;
-//$base-line-height: 1.4;
-
-// Fixed Font
-//$fixed-font-family: monospace;
-//$fixed-font-size: 85%;
-//$fixed-line-height: $base-line-height;
-
-// Headings
-$header-font-weight: $bold;
 
 // Body
 body {

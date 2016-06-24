@@ -1,4 +1,9 @@
 .footer{
   background-color: $black;
   min-height: 100px;
+  p{
+    text-align: center;
+    color: $white;
+    padding-top: 20px;
+  }
 }

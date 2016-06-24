@@ -1,7 +1,12 @@
 #form-container{
-  border: 1px solid red;
+  border: 1px solid $gray1;
   background-color: $white;
   border-radius: 7px;
   padding: 10px;
-  margin-top: 20px;
+}
+
+input {
+  outline:0;
+  box-shadow: 0 0 8px rgba(92,92,92,.6);
+  border-color: rgba(92,92,92,.8);
 }

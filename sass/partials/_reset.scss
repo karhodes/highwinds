@@ -1,1 +1,49 @@
+// ---------$Clearing out browser defaults, Reset Code 
 
+form * {
+  background: transparent;
+  behavior: url(../js/PIE.htc);
+}
+
+legend {
+  display:none;
+}
+
+fieldset:before{ /* in html, <fieldset title=Section 1"> */
+  content:attr(title);
+  display:block;
+  font: 1.2em Cantarell, Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  width: 80%;
+}
+
+input[type=text], input[type=password], input[type=submit], textarea, button {
+  -webkit-appearance:none;
+  -moz-appearance: none;
+  border: none;
+  background: none;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  padding: 0;
+  margin: 0;
+}
+
+div:not(#ray) > input[type=checkbox], div:not(#ray) > input[type=radio]{
+  display:none;
+}
+
+/* -- code to help with floated elements to keep track of heights -- */
+.group:before, .group:after {
+  content: "\0020";
+  display: block;
+  height: 0;
+  overflow: hidden;
+}
+
+.group:after {
+  clear:both;
+}
+
+.group {
+  zoom:1;
+}

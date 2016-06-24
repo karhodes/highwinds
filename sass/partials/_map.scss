@@ -1,9 +1,14 @@
 #mapContainer{
   background-image: url("../assets/patterns/brushed_@2X.png");
+  padding-bottom: 50px;
 }
 
 #map { 
   height: 450px;
   display: block;
   width: 100%;
+}
+
+#map-div{
+  margin-bottom: 30px;
 }
