@@ -1,5 +1,7 @@
 # Highwinds Homework Assignment
 
+Link to live site: [Highwinds](https://karhodes.github.io/highwinds/public/)
+
 ## Summary:
 Build a network map using the Google Maps API directly, with some light functionality. You can use other libraries such as JQuery for some of the functionality, but you must access the Google Maps API with your own code, not JQuery or a plugin for JQuery. You will drop a pin onto the addresses of our network POP's ("point of presence", having servers in a data center), draw lines between them to represent our network map, and build a feature that interacts with this map.  
 
