@@ -122,7 +122,8 @@ angular.module('mapsApp', [])
         clientToServerPath.push(closestServer);
 
         if (closestServer.name != $scope.pair.server) {
-          serverToServer = createRouteServerToServer(closestServer.name, $scope.pair.server, route);
+          serverToServer = createRouteServerToServer(closestServer.name, $scope.pair.server, route).pts;
+          // get dist as well
           clientToServerPath = clientToServerPath.concat(serverToServer);
         }
 
@@ -303,6 +304,7 @@ var createRouteServerToServer = function (server1, server2, route) {
   var pt1 = {};
   var pt2 = {};
   var pts = [];
+  var data = {};
 
   for (var i = 0; i < route.length; i++) {
     if (server1 === route[i].name) {
@@ -329,5 +331,13 @@ var createRouteServerToServer = function (server1, server2, route) {
   pts.push(pt2);
 
   console.log('and the total distance is... ', routeDist);
-  return pts;
+  // return pts;
+
+  data = {
+    pts: pts,
+    dist: routeDist,
+  };
+
+  return data;
+
 };
