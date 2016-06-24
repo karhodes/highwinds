@@ -55,9 +55,8 @@ body {
 
 h1 {
   font-family: "Karla-Bold", Helvetica, sans-serif;
-  font-weight: 600;
   text-align: center;
-  font-size: 50px;
+  font-size: 2.75em;
   margin: 50px auto; }
 
 h2 {
@@ -100,6 +99,9 @@ h2 {
   height: 450px;
   display: block;
   width: 100%; }
+
+#map-div {
+  margin-bottom: 30px; }
 
 .navbar.navbar-default {
   min-height: 80px;

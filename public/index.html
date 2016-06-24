@@ -14,7 +14,6 @@
   <link href="css/main.css" rel="stylesheet">
 
   <!-- JS -->
-  <script src="https://code.jquery.com/jquery-3.0.0.min.js"   integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0="   crossorigin="anonymous"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAH9qcwj9QQxgs9xEZylRLUVHO8_aojLEY&libraries=geometry">
   </script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
@@ -41,7 +40,7 @@
     <div id="mapContainer">
       <div class='container'>
         <h1>We own and operate our own network</h1>
-        <div class='col-md-8'>
+        <div class='col-md-8' id='map-div'>
           <div id='map'></div>
         </div>  
 
@@ -80,13 +79,21 @@
               <th>Distance (mi)</th>
               <th></th>
               <th></th>
-            <tr>
-            <tr ng-repeat='pair in clientServerPairs track by $index'>
+            </tr>
+            <tr ng-show="clientServerPairs!='undefined' && clientServerPairs!='null' && clientServerPairs.length!=0" ng-repeat='pair in clientServerPairs track by $index'>
               <td>{{ pair.client }}</td>
               <td>{{ pair.server }}</td>
               <td>{{ pair.dist }}</td>
               <td><button class="btn btn-primary" ng-click='viewPair($index)'>View</button></td>
               <td><button class="btn btn-danger" ng-click='deletePair($index)'><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button></td>
+            </tr>
+            <tr>
+              <td ng-show="clientServerPairs=='undefined' || clientServerPairs=='null' || clientServerPairs.length==0">No data to display</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
             </tr>  
           </table>
           <button class="btn btn-primary" ng-click='clearMap()'>Clear</button>

@@ -173,13 +173,13 @@ angular.module('mapsApp', [])
     };
 
     $scope.deletePair = function (idx) {
+      var currentPair = MapSvc.viewPair(idx);
+
       MapSvc.deletePair(idx);
       refresh();
     };
 
     $scope.clearMap = function(){
-      console.log('i was clicked!');
-
       // Clear any existing markers & path
       if ($scope.clientMarker != null) {
         $scope.clientMarker.setMap(null);
@@ -188,7 +188,7 @@ angular.module('mapsApp', [])
       if ($scope.clientToServerLine != null) {
         $scope.clientToServerLine.setMap(null);
       }
-      
+
     };
 
   })
