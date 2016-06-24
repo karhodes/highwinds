@@ -86,7 +86,8 @@ angular.module('mapsApp', [])
       var clientLoc = {};
       var closestServer = {};
       var clientToServerPath = [];
-      var serverToServer = [];
+      var serverToServerPts = [];
+      var routeDist = 0;
 
       $http({
         method: 'GET',
@@ -122,10 +123,13 @@ angular.module('mapsApp', [])
         clientToServerPath.push(closestServer);
 
         if (closestServer.name != $scope.pair.server) {
-          serverToServer = createRouteServerToServer(closestServer.name, $scope.pair.server, route).pts;
-          // get dist as well
-          clientToServerPath = clientToServerPath.concat(serverToServer);
+          serverToServerData = createRouteServerToServer(closestServer.name, $scope.pair.server, route);
+          serverToServerPts = serverToServerData.pts;
+          routeDist += serverToServerData.dist;
+          clientToServerPath = clientToServerPath.concat(serverToServerPts);
         }
+
+        $scope.pair.dist = routeDist;
 
         // Add clientToServerPath (array of pts) to $scope.pair
         // Create & place line
@@ -168,11 +172,14 @@ angular.module('mapsApp', [])
     var clientServerPairs = [];
 
     this.addPair = function (pair) {
+      console.log('pair.dist is: ', pair.dist);
+
       clientServerPairs.push({
         client: pair.client,
         server: pair.server,
         clientLoc: pair.clientLoc,
         clientToServerPath: pair.clientToServerPath,
+        dist: pair.dist,
       });
 
       var str = JSON.stringify(clientServerPairs);
