@@ -103,9 +103,11 @@ angular.module('mapsApp', [])
         clientLoc = {
           lat: response.data.results[0].geometry.location.lat,
           lng: response.data.results[0].geometry.location.lng,
-          name: '', // TODO:  set these values!
-          address: '', // TODO:  set these values!
+          name: 'Client Location', 
+          address: response.data.results[0].formatted_address,
         };
+
+        $scope.pair.client = response.data.results[0].formatted_address;
 
         // clear any existing clientMarkers & clientToServerPaths
         if ($scope.clientMarker != null) {
@@ -243,7 +245,6 @@ var createMarker = function (info, map) {
     position: { lat: info.lat, lng: info.lng },
     map: map,
     title: info.name,
-    // animation: google.maps.Animation.DROP
   });
 
   marker.content = '<div class="infoWindowContent">' + info.address + '</div>';
