@@ -122,6 +122,8 @@ angular.module('mapsApp', [])
         $scope.pair.clientLoc = {
           lat: clientLoc.lat,
           lng: clientLoc.lng,
+          name: 'Client Location', 
+          address: response.data.results[0].formatted_address,
         };
 
         $scope.clientMarker = createMarker(clientLoc, $scope.map);
@@ -241,10 +243,15 @@ var getByName = function (arr, value) {
 // CREATE MARKER ***************************************************
 var createMarker = function (info, map) {
   var infoWindow = new google.maps.InfoWindow();
+  var icon = '';
+
+  info.name === 'Client Location' ? icon = 'assets/img/location-pin-blue.png' : icon = 'assets/img/location-pin-red.png';
+
   var marker = new google.maps.Marker({
     position: { lat: info.lat, lng: info.lng },
     map: map,
     title: info.name,
+    icon: icon,
   });
 
   marker.content = '<div class="infoWindowContent">' + info.address + '</div>';
