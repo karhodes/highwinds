@@ -176,6 +176,21 @@ angular.module('mapsApp', [])
       MapSvc.deletePair(idx);
       refresh();
     };
+
+    $scope.clearMap = function(){
+      console.log('i was clicked!');
+
+      // Clear any existing markers & path
+      if ($scope.clientMarker != null) {
+        $scope.clientMarker.setMap(null);
+      }
+
+      if ($scope.clientToServerLine != null) {
+        $scope.clientToServerLine.setMap(null);
+      }
+      
+    };
+
   })
   .service('MapSvc', function () {
     var clientServerPairs = [];
@@ -228,6 +243,7 @@ var createMarker = function (info, map) {
     position: { lat: info.lat, lng: info.lng },
     map: map,
     title: info.name,
+    // animation: google.maps.Animation.DROP
   });
 
   marker.content = '<div class="infoWindowContent">' + info.address + '</div>';
@@ -279,6 +295,7 @@ var placeDistance = function (map, pt1, pt2) {
     position: inBetween,
     map: map,
     fontSize: 20,
+    zIndex: 100,
   });
 
   mapLabel.set('position', inBetween);

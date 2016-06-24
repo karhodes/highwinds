@@ -1,6 +1,47 @@
 body {
   background-color: #C4C4C4; }
 
+form * {
+  background: transparent;
+  behavior: url(../js/PIE.htc); }
+
+legend {
+  display: none; }
+
+fieldset:before {
+  /* in html, <fieldset title=Section 1"> */
+  content: attr(title);
+  display: block;
+  font: 1.2em Cantarell, Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  width: 80%; }
+
+input[type=text], input[type=password], input[type=submit], textarea, button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: none;
+  background: none;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  padding: 0;
+  margin: 0; }
+
+div:not(#ray) > input[type=checkbox], div:not(#ray) > input[type=radio] {
+  display: none; }
+
+/* -- code to help with floated elements to keep track of heights -- */
+.group:before, .group:after {
+  content: "\0020";
+  display: block;
+  height: 0;
+  overflow: hidden; }
+
+.group:after {
+  clear: both; }
+
+.group {
+  zoom: 1; }
+
 @font-face {
   font-family: "Karla";
   src: url("../assets/fonts/karla/Karla-Regular.ttf"); }
@@ -9,12 +50,18 @@ body {
   font-family: "Karla-Bold";
   src: url("../assets/fonts/karla/Karla-Bold.ttf"); }
 
+body {
+  font-family: "Karla", Helvetica, sans-serif; }
+
 h1 {
   font-family: "Karla-Bold", Helvetica, sans-serif;
   font-weight: 600;
   text-align: center;
   font-size: 50px;
   margin: 50px auto; }
+
+h2 {
+  font-family: "Karla-Bold", Helvetica, sans-serif; }
 
 .required-label {
   color: #FF1A1A; }
@@ -46,7 +93,8 @@ h1 {
   width: 90px; }
 
 #mapContainer {
-  background-image: url("../assets/patterns/brushed_@2X.png"); }
+  background-image: url("../assets/patterns/brushed_@2X.png");
+  padding-bottom: 50px; }
 
 #map {
   height: 450px;
@@ -72,18 +120,31 @@ h1 {
 .footer {
   background-color: #0F0F1A;
   min-height: 100px; }
+  .footer p {
+    text-align: center;
+    color: #FFF;
+    padding-top: 20px; }
 
 #form-container {
-  border: 1px solid red;
+  border: 1px solid #333333;
   background-color: #FFF;
   border-radius: 7px;
-  padding: 10px;
-  margin-top: 20px; }
+  padding: 10px; }
+
+input {
+  outline: 0;
+  box-shadow: 0 0 8px rgba(92, 92, 92, 0.6);
+  border-color: rgba(92, 92, 92, 0.8); }
+
+#table-section {
+  background-color: #FFF;
+  padding-top: 20px;
+  padding-bottom: 50px;
+  margin: 0;
+  border-top: 2px solid #333333; }
 
 #table-container {
-  border: 1px solid red;
-  background-color: #FFF;
-  border-radius: 7px;
-  padding: 10px;
-  margin-top: 20px;
-  margin-bottom: 50px; }
+  padding: 10px; }
+
+th {
+  font-family: "Karla-Bold", Helvetica, sans-serif; }
