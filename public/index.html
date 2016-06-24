@@ -6,7 +6,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Highwinds</title>
+  <title>CDN | Highwinds Content Delivery Network | Highwinds</title>
+  <link rel='shortcut icon' href='assets/img/favicon_highwinds.ico' type='image/x-icon'/ >
 
   <!-- CSS -->
   <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css' rel="stylesheet">
@@ -16,46 +17,76 @@
   <script src="https://code.jquery.com/jquery-3.0.0.min.js"   integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0="   crossorigin="anonymous"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAH9qcwj9QQxgs9xEZylRLUVHO8_aojLEY&libraries=geometry">
   </script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
   <script type='text/javascript' src='js/app.js'></script>
 </head>
 
 <body>
-  <div class="container"> 
-    <h1>Highwinds Network Map</h1>
-    <div class='col-md-6'>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="https://www.highwinds.com/">
+          <img id="logo" alt="Highwinds logo" src="assets/img/HW-logo.png">
+        </a>
+      </div>    
+      <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#">NETWORK</a></li>
+        </ul>  
+      </div>  
+    </div> 
+  </nav>
+
+  <div id="mapContainer" ng-app="mapsApp" ng-controller="MapCtrl">
+    <div class='container'>
+      <h1>We own and operate our own network</h1>
       <div id='map'></div>
-    </div>
 
-    <div class='col-md-6'>
-      <form class="form-horizontal">
-        <div class="form-group">
-          <label for="server" class="col-sm-2 control-label">Server</label>
-          <div class="col-sm-10">
-            <select class="form-control">
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="inputPassword3" class="col-sm-2 control-label">Password</label>
-          <div class="col-sm-10">
-            <input type="password" class="form-control" id="inputPassword3" placeholder="Password">
-          </div>
-        </div>
-        <div class="form-group">
-          <div class="col-sm-offset-2 col-sm-10">
-            <button type="submit" class="btn btn-default">Sign in</button>
-          </div>
-        </div>
-      </form>
-    </div>  
-  </div><!-- /container --> 
+      <!-- Form to accept client / server pairs -->
+      <div class='col-md-4' id='form-container'>
+        <div >
+          <h2>See how we connect</h2>
+          <form ng-submit='onSubmit()'>
+            <div class='form-group'>
+              <label for="clientAddress">Client Location<span class='required-label'>*</span></label>
+              <input required ng-model='pair.client' id='clientAddress' class="form-control" type='textbox' placeholder='Enter an address'>
+            </div>
+            <div class='form-group'>
+              <label for="serverNames">Server Location<span class='required-label'>*</span></label>
+              <select required id='serverNames' class="form-control" ng-model='pair.server'>
+                <option value="">Select a server location</option>
+                <option ng-repeat="server in serverLocs" value="{{server.name}}">{{server.name}}</option>
+              </select>
+            </div>   
+            <button type='submit' id='submit' class="btn btn-primary">Submit</button>  
+          </form>  
+        </div>  
+      </div>  
 
-  <footer class="footer">
-    <p>FOOTER</p>
-  </footer>
+      <!-- Client / server pair search results -->
+      <div class='col-md-8' id='table-container'>
+        <h2>Your client / server pairs</h2>
+        <table id='clientServerPairs' class='table'>
+          <tr>
+            <th>Client Location</th>
+            <th>Server Location</th>
+            <th></th>
+            <th></th>
+          <tr>
+          <tr ng-repeat='pair in clientServerPairs track by $index'>
+            <td>{{ pair.client }}</td>
+            <td>{{ pair.server }}</td>
+            <td><button class="btn btn-primary" ng-click='viewPair($index)'>View</button></td>
+            <td><button class="btn btn-danger" ng-click='deletePair($index)'><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button></td>
+          </tr>  
+        </table>
+      </div>  
+ 
+    </div><!-- /container -->  
+  </div><!-- /mapContainer --> 
+
+  <footer class='footer'>
+    <p>Footer Text</p>
+  </footer>  
+
 </body>

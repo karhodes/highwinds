@@ -1,4 +1,89 @@
+body {
+  background-color: #C4C4C4; }
+
+@font-face {
+  font-family: "Karla";
+  src: url("../assets/fonts/karla/Karla-Regular.ttf"); }
+
+@font-face {
+  font-family: "Karla-Bold";
+  src: url("../assets/fonts/karla/Karla-Bold.ttf"); }
+
+h1 {
+  font-family: "Karla-Bold", Helvetica, sans-serif;
+  font-weight: 600;
+  text-align: center;
+  font-size: 50px;
+  margin: 50px auto; }
+
+.required-label {
+  color: #FF1A1A; }
+
+.btn {
+  border: none;
+  border-radius: 0px; }
+
+.btn-primary {
+  background-color: #022659;
+  color: #FFF; }
+
+.btn-primary:hover {
+  background-color: #0024F2;
+  color: #FFF;
+  border: none; }
+
+.btn-danger {
+  background-color: #CC1515;
+  color: #FFF; }
+
+.btn-danger:hover {
+  background-color: #FF1A1A;
+  color: #FFF;
+  border: none; }
+
+#logo {
+  height: 50px;
+  width: 90px; }
+
+#mapContainer {
+  background-image: url("../assets/patterns/brushed_@2X.png"); }
+
 #map {
-  height: 200px;
+  height: 450px;
   display: block;
   width: 100%; }
+
+.navbar.navbar-default {
+  min-height: 80px;
+  line-height: 80px;
+  margin-bottom: 0px; }
+
+.navbar-default .navbar-nav > li > a {
+  font-family: "Karla", Helvetica, sans-serif;
+  font-size: 14.4px;
+  font-weight: bold;
+  color: #333333;
+  padding: 30px; }
+
+.navbar-default .navbar-nav > li > a:hover {
+  background-color: #FF1A1A;
+  color: #FFF; }
+
+.footer {
+  background-color: #0F0F1A;
+  min-height: 100px; }
+
+#form-container {
+  border: 1px solid red;
+  background-color: #FFF;
+  border-radius: 7px;
+  padding: 10px;
+  margin-top: 20px; }
+
+#table-container {
+  border: 1px solid red;
+  background-color: #FFF;
+  border-radius: 7px;
+  padding: 10px;
+  margin-top: 20px;
+  margin-bottom: 50px; }

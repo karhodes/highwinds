@@ -1,1 +1,21 @@
+@font-face {
+  font-family: "Karla";
+  src: url("../assets/fonts/karla/Karla-Regular.ttf");
+}
 
+@font-face {
+  font-family: "Karla-Bold";
+  src: url("../assets/fonts/karla/Karla-Bold.ttf");
+}
+
+h1{
+  font-family: $base-font-family-bold;
+  font-weight: $bold;
+  text-align: center;
+  font-size: 50px;
+  margin: 50px auto;
+}
+
+.required-label{
+  color: $red;
+}
